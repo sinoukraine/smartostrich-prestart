@@ -1,0 +1,89 @@
+import Home from '../pages/home.vue';
+import Questions from '../pages/questions'
+import Trips from '../pages/trips'
+import Trip from '../pages/trip'
+import Settings from '../pages/settings'
+import Faults from '../pages/faults'
+import Fault from '../pages/fault'
+import Notifications from '../pages/notifications'
+import Notification from '../pages/notification'
+import Messages from '../pages/messages'
+import Message from '../pages/message'
+import AccidentReport from '../pages/accident-report'
+
+
+
+
+
+import NotFoundPage from '../pages/404.vue';
+
+var routes = [
+    {
+        path: '/',
+        name: 'home',
+        component: Home,
+    },
+    {
+        path: '/questions/',
+        name: 'questions',
+        component: Questions
+    },
+    {
+        path: '/trips/',
+        name: 'trips',
+        component: Trips
+    },
+    {
+        path: '/trip/',
+        name: 'trip',
+        component: Trip
+    },
+    {
+        path: '/settings/',
+        name: 'settings',
+        component: Settings
+    },
+    {
+        path: '/faults/',
+        name: 'faults',
+        component: Faults
+    },
+    {
+        path: '/fault/',
+        name: 'fault',
+        component: Fault
+    },
+    {
+        path: '/notifications/',
+        name: 'notifications',
+        component: Notifications
+    },
+    {
+        path: '/notification/',
+        name: 'notification',
+        component: Notification
+    },
+    {
+        path: '/messages/',
+        name: 'messages',
+        component: Messages
+    },
+    {
+        path: '/message/',
+        name: 'message',
+        component: Message
+    },
+    {
+        path: '/accident-report/',
+        name: 'accident-report',
+        component: AccidentReport
+    },
+
+
+    {
+        path: '(.*)',
+        component: NotFoundPage,
+    },
+];
+
+export default routes;
