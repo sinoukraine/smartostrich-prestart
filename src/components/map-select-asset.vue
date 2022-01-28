@@ -81,7 +81,7 @@
         <div class="row position-absolute bottom-0 width-100 over-map">
           <div class="col padding">
             <button
-                class="button button-fill color-green"
+                class="button button-fill color-custom"
                 @click="confirmSelection"
                 :class="{ disabled : !assetList.length || !selectedNewAssetImei }"
             >

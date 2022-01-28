@@ -3,7 +3,7 @@
     <f7-view>
       <f7-page class="bg-color-white">
         <f7-block class="menu-top-block">
-          <img :src=" require('../static/images/logo.png') " alt="">
+          <img :src=" require('../static/images/logo.svg') " alt="">
           <slot v-if="isLoggedIn && info && info.User">
             <p class="text-color-white no-margin-bottom">{{info.User.FirstName}} {{info.User.SubName}}</p>
             <p class="text-color-gray no-margin-top">{{info.User.EMail}}</p>
@@ -87,9 +87,7 @@
 .menu-top-block{
   margin: 0;
   padding: 32px 16px;
-  background: url("../static/images/bgmenu.png") no-repeat left top;
-  background-size: cover;
-  background-color: #333333;
+  background-color: #000713;
 }
   .menu-top-block img{
     width: 100%;

@@ -58,7 +58,7 @@
     data() {
       return {
         passwordType: 'password',
-        logo: 'static/images/logo.png',
+        logo: 'static/images/logo.svg',
         username: null,
         password: null,
       }

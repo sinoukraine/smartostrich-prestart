@@ -31,7 +31,7 @@
           data: function () {
             return {
               logo: 'static/images/logo.png',
-              logoModal: 'static/images/logo-dark.png',
+              logoModal: 'static/images/logo-black.svg',
 
               AppDetails: {
                 appId: '',

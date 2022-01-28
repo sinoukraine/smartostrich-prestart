@@ -84,7 +84,7 @@
         <!-- Toolbar-->
         <f7-toolbar bottom no-shadow class="custom-toolbar">
           <div class="row width-100 padding-horizontal">
-            <f7-button color="green" fill class="col text-uppercase" @click="showCheckList">{{$ml.get('HOME_MSG005')}}</f7-button>
+            <f7-button color="custom" fill class="col text-uppercase" @click="showCheckList">{{$ml.get('HOME_MSG005')}}</f7-button>
           </div>
         </f7-toolbar>
 
@@ -97,7 +97,7 @@
               :key="componentKeyVehicle"
           >
             <f7-icon slot="media" icon="f7-icons icon-other-asset text-color-lightgray"></f7-icon>
-            <div slot="content-end" @click.stop="isMapSelectAssetOpened = true" class="link margin-right"><i class="f7-icons icon-address text-color-green "></i></div>
+            <div slot="content-end" @click.stop="isMapSelectAssetOpened = true" class="link margin-right"><i class="f7-icons icon-address text-color-blue "></i></div>
             <select name="assetList" v-model="selectedAsset" required validate>
               <option
                   v-for="asset in assetList"
