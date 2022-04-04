@@ -161,10 +161,12 @@
           </f7-list-item>
 
           <f7-list-item
+             
             class="item-input custom-smart-select-wrapper cheklist-smart-select"
             :title="$ml.get('HOME_MSG002')"
             smart-select
             :key="componentKeyChecklist"
+            ref="checklistSmartSelect"
           >
             <f7-icon
               slot="media"
@@ -185,6 +187,12 @@
                 {{ list.Name }}
               </option>
             </select>
+          </f7-list-item>
+
+          <f7-list-item>
+             <a href="/check-list/" class="item-link item-content">
+                  <div class="item-inner">Go to Check List</div>
+                </a>
           </f7-list-item>
 
           <f7-list-item
@@ -242,6 +250,7 @@ export default {
         localStorage.IMMOBILISATION_STATE &&
         localStorage.IMMOBILISATION_STATE === "on",
       isImmobilisationSupported: false,
+    
 
       //tripTypeText: enumTripTypes
       //user: this.$f7route.context.user,
@@ -308,6 +317,7 @@ export default {
           return;
         }
       }
+   
     },
     currentTrip(val) {
       console.log("currentTrip", val);
@@ -485,16 +495,17 @@ export default {
       this.getCurrentTripDuration();
     }
 
-    var mySmartSelect = this.$f7.smartSelect.create({
-      el: ".cheklist-smart-select",
-      renderItem: function (item, index) {
-         
-        return `<div>!!!!</div>` 
-      },
- 
-    });
+    setTimeout(() => {
+      var checklistSmartSelect = this.$refs.checklistSmartSelect.f7SmartSelect;
 
-    mySmartSelect.open()
+      var mySmartSelect = this.$f7.smartSelect.create({
+        el: ".cheklist-smart-select a",
+    
+      });
+
+   
+      
+    }, 1000);
   },
 };
 </script>

@@ -10,6 +10,7 @@ import Notification from '../pages/notification'
 import Messages from '../pages/messages'
 import Message from '../pages/message'
 import AccidentReport from '../pages/accident-report'
+import CheckList from '../pages/check-list'
 
 
 
@@ -27,6 +28,11 @@ var routes = [
         path: '/questions/',
         name: 'questions',
         component: Questions
+    },
+    {
+        path: '/check-list/',
+        name: 'check-list',
+        component: CheckList
     },
     {
         path: '/trips/',
