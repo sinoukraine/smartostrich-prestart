@@ -191,3 +191,6 @@
 .icon-menu-asset:before {
   content: "\59";
 }
+.icon-scan:before {
+  content: "\5a";
+}

@@ -102,7 +102,7 @@
   import {mapGetters, mapActions} from 'vuex'
   import FaultPopup from '../components/questions/fault-popup'
   import SummaryPopup from '../components/questions/summary-popup'
-
+   import checkLists from '../js/helpers/check-list'
   import moment from 'moment'
   import tFormat from '../js/helpers/time-formats'
 
@@ -313,7 +313,7 @@
       },
     },
     mounted() {
-      let checklist = this.info.CheckList.find(checklist => checklist.Code === this.$f7route.query.cheklist );
+      let checklist = checkLists.find(checklist => checklist.Code === this.$f7route.query.cheklist );
       checklist.Options = this.$f7.methods.sortArrayByObjProps(checklist.Options, {
         prop:'Order',
         direction: 1

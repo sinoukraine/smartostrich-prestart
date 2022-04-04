@@ -1,4 +1,4 @@
-const DOMAIN1 = "https://api.m2mglobaltech.com/";
+const DOMAIN1 = "https://newapi.quiktrak.co/";
 
 const DOMAIN4 = "https://osrm.sinopacific.com.ua/";
 const DOMAIN7 = "https://nominatim.sinopacific.com.ua/";
@@ -39,4 +39,4 @@ export default {
     GET_ASSET_DETAILS: DOMAIN1 + "Common/v1/Activation/GetAssetsInfo",
   }
 }
-//https://api.m2mglobaltech.com/Common/v1/Activation/GetAssetsInfo
+//https://newapi.quiktrak.co/Common/v1/Activation/GetAssetsInfo
