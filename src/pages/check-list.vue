@@ -23,12 +23,14 @@
         > 
       </div>
     </f7-toolbar>
+
+     <!-- :checklist = "checklist" -->
    <summary-popup
       :openPopup="isSummaryPopupOpen"
       :answers = "answers"
       :imei = "imei"
       :assetName = "assetName"
-      :checklist = "checklist"
+     
       @closePopup="isSummaryPopupOpen = false"
       @closeCheckList = "closeCheckList"
       @selectTripType = "selectTripType"
@@ -76,6 +78,8 @@ export default {
     answers: {},
     isAllAnswered: false,
        isSummaryPopupOpen: false,
+       imei: "",
+       assetName: "",
   }),
   components: {
       SummaryPopup
