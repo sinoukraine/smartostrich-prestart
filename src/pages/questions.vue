@@ -3,12 +3,12 @@
 
     <f7-navbar large>
       <f7-nav-left >
-        <f7-link icon="icon-back" @click="closeCheckList"></f7-link>
+        <f7-link icon="icon-back" @click="closeCheckList(false)"></f7-link>
       </f7-nav-left>
       <f7-nav-title sliding>{{pageTitle}}</f7-nav-title>
       <f7-nav-title-large>{{pageTitle}}</f7-nav-title-large>
       <f7-nav-right>
-        <f7-link icon="icon-header-close" @click="closeCheckList"></f7-link>
+        <f7-link icon="icon-header-close" @click="closeCheckList(false)"></f7-link>
       </f7-nav-right>
     </f7-navbar>
 
@@ -124,9 +124,8 @@
     methods: {
       closeCheckList(isDone) {
 
-        if(isDone) {
-           
-                this.$f7router.back()
+        if(isDone) { 
+          this.$f7router.back()
         } else {
              this.$f7.methods.customDialog({
           title: this.pageTitle,
@@ -138,7 +137,6 @@
             {
               text: this.$ml.get('COM_MSG002'),
               onClick: ()=>{
-                
                 this.$f7router.back()
               }
             }

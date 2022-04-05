@@ -309,6 +309,8 @@ export default {
       isImmobilisationSupported: false,
       firstName: "",
       lastName: "",
+      customerAddress: "",
+      customerName: ""
 
       //tripTypeText: enumTripTypes
       //user: this.$f7route.context.user,
@@ -418,7 +420,7 @@ export default {
                     <div class="list no-margin no-hairlines text-color-black">
                         <ul>
                             <li>
-                                <label class="item-radio item-content color-green">
+                                <label class="item-radio item-content color-custom">
                                     <input type="radio" name="trip-type" value="1"  checked/>
                                     <i class="icon icon-radio"></i>
                                     <div class="item-inner">
@@ -426,16 +428,17 @@ export default {
                                     </div>
                                 </label>
                             </li>
-                        
-                            <li>
-                                <label class="item-radio item-content color-green">
-                                    <input type="radio" name="trip-type" value="3"  />
+                             <li>
+                                <label class="item-radio item-content color-custom">
+                                    <input type="radio" name="trip-type" value="2"  />
                                     <i class="icon icon-radio"></i>
                                     <div class="item-inner">
-                                        <div class="item-title">${ this.$ml.get('COM_MSG016') }</div>
+                                        <div class="item-title">${ this.$ml.get('COM_MSG015') }</div>
                                     </div>
                                 </label>
                             </li>
+                        
+                            
                         </ul>
                     </div>
                 `;

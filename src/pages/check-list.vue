@@ -20,7 +20,7 @@
           :class="{ disabled: !isAllAnswered }"
           @click="isSummaryPopupOpen = true"
           >{{ $ml.get("COM_MSG009") }}</f7-button
-        >
+        > 
       </div>
     </f7-toolbar>
    <summary-popup
