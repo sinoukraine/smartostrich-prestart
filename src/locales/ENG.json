@@ -39,6 +39,7 @@
   "COM_MSG035": "Select date range",
   "COM_MSG036": "Close",
   "COM_MSG037": "Select",
+  "COM_MSG038": "Done",
 
 
   "PROMPT_MSG000": "Error",
@@ -103,10 +104,12 @@
   "HOME_MSG011": "Unimmobilise",
   "HOME_MSG012": "Duration",
   "HOME_MSG013": "Accident report",
+  "HOME_MSG014": "Customer Name",  
+  "HOME_MSG015": "Customer Address",
 
-  "QUESTIONS_MSG001": "Fail",
+  "QUESTIONS_MSG001": "Yes",
   "QUESTIONS_MSG002": "N/A",
-  "QUESTIONS_MSG003": "Pass",
+  "QUESTIONS_MSG003": "No",
   "QUESTIONS_MSG004": "No Photo",
   "QUESTIONS_MSG005": "At the end of the trip, please go to the home screen and close the current trip.",
   "QUESTIONS_MSG006": "IMPORTANT: You will not be able to start a new trip if you do not close the previous one.",

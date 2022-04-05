@@ -18,7 +18,7 @@
 
       <f7-toolbar bottom no-shadow class="custom-toolbar">
         <div class="row width-100 padding-horizontal">
-          <f7-button color="green" fill class="col text-uppercase" @click="submitHandler">{{$ml.get('COM_MSG008')}}</f7-button>
+          <f7-button color="custom" fill class="col text-uppercase" @click="submitHandler">{{$ml.get('COM_MSG008')}}</f7-button>
         </div>
       </f7-toolbar>
 
@@ -45,17 +45,17 @@
 
       <f7-block-title class="text-uppercase text-align-center">{{$ml.get('QUESTIONS_MSG007')}}</f7-block-title>
       <f7-block class="row">
-        <div class="col-33 rounded-small text-color-white bg-color-red text-align-center padding-vertical">
+        <div class="col-50 rounded-small text-color-white bg-color-red text-align-center padding-vertical">
           <div><i class="f7-icons icon-other-fail size-36 padding-bottom-8"></i></div>
           <div>{{$ml.get('QUESTIONS_MSG008')}}</div>
           <div>{{ summary['fail'] }}</div>
         </div>
-        <div class="col-33 rounded-small text-color-white bg-color-orange text-align-center padding-vertical">
+        <!-- <div class="col-33 rounded-small text-color-white bg-color-orange text-align-center padding-vertical">
           <div><i class="f7-icons icon-other-na-items size-36 padding-bottom-8"></i></div>
           <div>{{$ml.get('QUESTIONS_MSG009')}}</div>
           <div>{{ summary['na'] }}</div>
-        </div>
-        <div class="col-33 rounded-small text-color-white bg-color-green text-align-center padding-vertical">
+        </div> -->
+        <div class="col-50 rounded-small text-color-white bg-color-custom text-align-center padding-vertical">
           <div><i class="f7-icons icon-other-passed-items size-36 padding-bottom-8"></i></div>
           <div>{{$ml.get('QUESTIONS_MSG010')}}</div>
           <div>{{ summary['pass'] }}</div>

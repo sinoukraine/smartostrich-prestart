@@ -17,7 +17,7 @@
 
       <f7-toolbar bottom no-shadow class="custom-toolbar">
         <div class="row width-100 padding-horizontal">
-          <label for="submit-popup-form" class="col button button-fill text-uppercase bg-color-green">
+          <label for="submit-popup-form" class="col button button-fill text-uppercase bg-color-custom">
             {{$ml.get('COM_MSG009')}}
           </label>
         </div>
@@ -42,7 +42,7 @@
             @click="$refs.photoBrowser.open()"
           >
         </div>
-        <div class="top-img-load-button bg-color-green" @click="openUploadImgOptions">
+        <div class="top-img-load-button bg-color-custom" @click="openUploadImgOptions">
           <i class="f7-icons icon-other-photo text-color-white"></i>
         </div>
       </div>

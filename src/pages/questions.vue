@@ -14,7 +14,7 @@
 
     <f7-toolbar bottom no-shadow class="custom-toolbar">
       <div class="row width-100 padding-horizontal">
-        <f7-button color="green" fill class="col text-uppercase" :class="{disabled: !isAllAnswered}" @click="isSummaryPopupOpen = true">{{$ml.get('COM_MSG009')}}</f7-button>
+        <f7-button color="custom" fill class="col text-uppercase" :class="{disabled: !isAllAnswered}" @click="closeCheckList(true)">{{$ml.get('COM_MSG038')}}</f7-button>
       </div>
     </f7-toolbar>
 
@@ -30,16 +30,7 @@
       @setFault="setFault"
     />
 
-    <summary-popup
-      :openPopup="isSummaryPopupOpen"
-      :answers = "answers"
-      :imei = "imei"
-      :assetName = "assetName"
-      :checklist = "checklist"
-      @closePopup="isSummaryPopupOpen = false"
-      @closeCheckList = "closeCheckList"
-      @selectTripType = "selectTripType"
-    />
+ 
     <div class="list media-list no-hairlines">
       <ul>
         <li
@@ -71,15 +62,10 @@
                     @click="openFaultPopup(question.Code)"
                   >{{$ml.get('QUESTIONS_MSG001')}}</button>
 
-                  <button
-                    class="col button button-fill color-orange question-button "
-                    :data-state="'na'"
-                    :class="{active: question.selectedState === 'na'}"
-                    @click="setQuestionState('na', question.Code)"
-                  >{{$ml.get('QUESTIONS_MSG002')}}</button>
+                 
 
                   <button
-                    class="col button button-fill color-green question-button "
+                    class="col button button-fill color-custom  question-button "
                     :data-state="'pass'"
                     :class="{active: question.selectedState === 'pass'}"
                     @click="setQuestionState('pass', question.Code)"
@@ -101,7 +87,7 @@
   //import $$ from 'dom7';
   import {mapGetters, mapActions} from 'vuex'
   import FaultPopup from '../components/questions/fault-popup'
-  import SummaryPopup from '../components/questions/summary-popup'
+  
    import checkLists from '../js/helpers/check-list'
   import moment from 'moment'
   import tFormat from '../js/helpers/time-formats'
@@ -125,10 +111,10 @@
       savedNotes: '',
       savedImg: '',
 
-      isSummaryPopupOpen: false,
+      
     }),
     components: {
-      SummaryPopup,
+      
       FaultPopup
     },
     computed: {
@@ -136,8 +122,13 @@
 
     },
     methods: {
-      closeCheckList() {
-        this.$f7.methods.customDialog({
+      closeCheckList(isDone) {
+
+        if(isDone) {
+           
+                this.$f7router.back()
+        } else {
+             this.$f7.methods.customDialog({
           title: this.pageTitle,
           text: this.$ml.get('PROMPT_MSG004'),
           buttons:[
@@ -147,12 +138,14 @@
             {
               text: this.$ml.get('COM_MSG002'),
               onClick: ()=>{
-                this.isSummaryPopupOpen = false;
+                
                 this.$f7router.back()
               }
             }
           ]
         })
+        }
+       
       },
       async setQuestionState(state = '', code = '', additionalDetails = {}){
         this.answers[code] = {
@@ -305,7 +298,7 @@
 
                 }
                 this.$f7.view.main.router.back();
-                this.isSummaryPopupOpen = false;
+               
               }
             }
           ]
@@ -313,6 +306,8 @@
       },
     },
     mounted() {
+
+     
       let checklist = checkLists.find(checklist => checklist.Code === this.$f7route.query.cheklist );
       checklist.Options = this.$f7.methods.sortArrayByObjProps(checklist.Options, {
         prop:'Order',

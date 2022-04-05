@@ -123,4 +123,30 @@ export default [
   "CustomerCode": "d0e0c662-a9d0-4b3e-8f8c-954273f0db96"
 },
 
+{
+    "Options": [
+        {
+            "Reasons": [],
+            "Code": "b480ac34-4d94-494a-7cfb-34d817605a2d",
+            "CheckCode": "5",
+            "Name": "Take Picture of Load Sheet",
+            "Memo": "",
+            "Order": 97
+        },
+        {
+            "Reasons": [],
+            "Code": "42e4a1bd-ad89-49c5-68c5-117aa00190f8",
+            "CheckCode": "5",
+            "Name": "Take Picture of Seal",
+            "Memo": "",
+            "Order": 98
+        },
+    
+     
+    ],
+    "Code": "5",
+    "Name": "Load Sheet",
+    "CustomerCode": "d0e0c662-a9d0-4b3e-8f8c-954273f0db96"
+},
+
 ]
