@@ -190,7 +190,8 @@
           </f7-list-item> -->
 
           <f7-list-item
-            link="/check-list/"
+            link 
+             @click="showCheckList"
             class="item-input custom-smart-select-wrapper"
           >
             <f7-icon
@@ -542,7 +543,7 @@ export default {
       /*this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));*/
 
       this.$f7router.navigate({
-        name: "questions",
+        name: "check-list",
         query: {
           imei: this.selectedAsset,
           cheklist: this.selectedCheckList,

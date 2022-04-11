@@ -20,38 +20,31 @@
           :class="{ disabled: !isAllAnswered }"
           @click="isSummaryPopupOpen = true"
           >{{ $ml.get("COM_MSG009") }}</f7-button
-        > 
+        >
       </div>
     </f7-toolbar>
 
-     <!-- :checklist = "checklist" -->
-   <summary-popup
+    <!-- :checklist = "checklist" -->
+    <summary-popup
       :openPopup="isSummaryPopupOpen"
-      :answers = "answers"
-      :imei = "imei"
-      :assetName = "assetName"
-     
+      :answers="answers"
+      :imei="imei"
+      :assetName="assetName"
       @closePopup="isSummaryPopupOpen = false"
-      @closeCheckList = "closeCheckList"
-      @selectTripType = "selectTripType"
+      @closeCheckList="closeCheckList"
+      @selectTripType="selectTripType"
     />
     <f7-list>
       <f7-list-item
         checkbox
-        v-model="selectedCheckList"
         v-for="list in checkLists"
         ref="checkLists"
+        :checked="isAllAnswered"
         :key="list.Code"
         :value="list.Code"
         class="item-input custom-smart-select-wrapper"
         @click="showCheckList(list.Code)"
-        @change="checkAllAnswer('check', list.Code)"
       >
-        <!-- <f7-icon
-              slot="media"
-              icon="f7-icons icon-other-passed-items text-color-lightgray"
-            ></f7-icon> -->
-
         {{ list.Name }}
       </f7-list-item>
     </f7-list>
@@ -62,7 +55,7 @@
 //import Vue from 'vue'
 //import $$ from 'dom7';
 import { mapGetters, mapActions } from "vuex";
-import SummaryPopup from '../components/questions/summary-popup'
+import SummaryPopup from "../components/questions/summary-popup";
 import checkLists from "../js/helpers/check-list";
 import moment from "moment";
 import tFormat from "../js/helpers/time-formats";
@@ -77,20 +70,17 @@ export default {
     selectedCheckList: null,
     answers: {},
     isAllAnswered: false,
-       isSummaryPopupOpen: false,
-       imei: "",
-       assetName: "",
+    isSummaryPopupOpen: false,
+    imei: "",
+    assetName: "",
+    selectedAsset: "",
+    panelDamageStore: "",
+    chekedList: {},
   }),
   components: {
-      SummaryPopup
+    SummaryPopup,
   },
 
-  props: {
-    selectedImei: {
-      type: String,
-      default: "",
-    },
-  },
   computed: {
     ...mapGetters(["info"]),
   },
@@ -103,7 +93,7 @@ export default {
       if (this.assetList.length) {
         let asset = this.assetList.find((itm) => !itm.ContactCode);
         if (asset) {
-          this.selectedImei = asset.IMEI;
+          this.selectedAsset = asset.IMEI;
         }
       }
       // if(this.checkLists.length){
@@ -112,17 +102,20 @@ export default {
     },
   },
   methods: {
-    checkAllAnswer(state = "", code = "", additionalDetails = {}) {
-      this.answers[code] = {
-        ...additionalDetails,
-        state,
-      };
+    // checkAllAnswer(state = "", code = "", additionalDetails = {}) {
+    //   this.answers[code] = {
+    //     ...additionalDetails,
+    //     state,
+    //   };
 
-      let answeredKeys = Object.keys(this.answers);
-      if (answeredKeys.length === this.checkLists.length) {
-        this.isAllAnswered = true;
-      }
-    },
+    //   console.log(this.answers)
+
+    //   let answeredKeys = Object.keys(this.answers);
+    //   if (answeredKeys.length === this.checkLists.length) {
+    //     this.isAllAnswered = true;
+    //   }
+
+    // },
     showCheckList(code) {
       this.selectedCheckList = code;
       if (!this.selectedCheckList) {
@@ -132,18 +125,25 @@ export default {
         });
         return;
       }
-
-      if (!this.selectedImei) {
+      if (!this.selectedAsset) {
         this.$f7.methods.customDialog({
           title: this.pageTitle,
           text: this.$ml.get("PROMPT_MSG006"),
         });
         return;
       }
+
+      console.log(this.chekedList);
+
+      let answeredKeys = Object.keys(this.chekedList);
+      if (answeredKeys.length === this.checkLists.length) {
+        this.isAllAnswered = true;
+      }
+
       this.$f7router.navigate({
         name: "questions",
         query: {
-          imei: this.selectedImei,
+          imei: this.selectedAsset,
           cheklist: this.selectedCheckList,
           isDriver: this.isDriver,
         },
@@ -161,56 +161,13 @@ export default {
             text: this.$ml.get("COM_MSG002"),
             onClick: () => {
               this.isSummaryPopupOpen = false;
-              this.$f7router.back();
+              this.$f7router.navigate({
+                name: "home",
+              });
             },
           },
         ],
       });
-    },
-    async setQuestionState(state = "", code = "", additionalDetails = {}) {
-      this.answers[code] = {
-        ...additionalDetails,
-        state,
-      };
-
-      this.checklist.Options.find(
-        (option) => option.Code === code
-      ).selectedState = state;
-      //await Vue.nextTick();
-      await this.$nextTick();
-
-      let answeredKeys = Object.keys(this.answers);
-      if (answeredKeys.length === this.checklist.Options.length) {
-        this.isAllAnswered = true;
-      }
-    },
-    async openFaultPopup(code) {
-      this.faultOption = this.checklist.Options.find(
-        (option) => option.Code === code
-      );
-      //this.faultSelectedReason='';
-      this.savedNotes = "";
-      this.savedImg = "";
-
-      if (this.answers[code] && this.answers[code].state === "fail") {
-        //this.faultSelectedReason = this.answers[code].reasonCode;
-        this.savedNotes = this.answers[code].notes;
-        this.savedImg = this.answers[code].img;
-      } else {
-        /*if(this.faultOption.Reasons && this.faultOption.Reasons.length){
-            this.faultSelectedReason = this.faultOption.Reasons[0].Code;
-          }*/
-      }
-
-      //fix to rerender popup and reinit smart select
-      this.faultPopupKey += 1;
-      //await Vue.nextTick();
-      await this.$nextTick();
-      this.isFaultPopupOpen = true;
-    },
-    setFault(faultDetails) {
-      this.setQuestionState("fail", faultDetails.optionCode, faultDetails);
-      this.isFaultPopupOpen = false;
     },
 
     selectTripType(params) {
@@ -349,49 +306,70 @@ export default {
     },
   },
   mounted() {
-    this.assetList = this.info.Devices || [];
+    let panelDamageStore = this.$f7.methods.getFromStorage("panelDamage");
+    let trailerFloorStore = this.$f7.methods.getFromStorage("trailerFloor");
+    let trailerSidePanelStore =
+      this.$f7.methods.getFromStorage("trailerSidePanel");
+    let tyresStore = this.$f7.methods.getFromStorage("tyres");
+    let loadSheetStore = this.$f7.methods.getFromStorage("loadSheet");
+    let checkedCount = 0;
 
-    if (this.assetList.length) {
-      let asset = this.assetList.find((itm) => !itm.ContactCode);
-      if (asset) {
-        this.selectedImei = asset.IMEI;
+    this.$nextTick(() => {
+      if (Object.keys(panelDamageStore).length !== 0) {
+        this.$refs.checkLists[0].checked = true;
+        this.answers.PanelDamaged = { state: "pass" };
+      } else {
+        this.$refs.checkLists[0].checked = false;
       }
-    }
-
-    this.checkLists = checkLists;
-    // if (this.checkLists.length) {
-    //   this.selectedCheckList = this.checkLists[0].Code;
-    // }
-
-    let checklist = checkLists.find(
-      (checklist) => checklist.Code === this.$f7route.query.cheklist
-    );
-    checklist.Options = this.$f7.methods.sortArrayByObjProps(
-      checklist.Options,
-      {
-        prop: "Order",
-        direction: 1,
-      },
-      {
-        prop: "Name",
-        direction: 1,
+      if (Object.keys(trailerFloorStore).length !== 0) {
+        this.$refs.checkLists[1].checked = true;
+        this.answers.TrailerFloor = { state: "pass" };
+      } else {
+        this.$refs.checkLists[1].checked = false;
       }
-    );
 
-    //use Vue.set to make our states(fail, na, pass) be reactive when user change them
-    checklist.Options.forEach((el) => {
-      //Vue.set(el, 'selectedState', '')
-      this.$set(el, "selectedState", "");
+      if (Object.keys(trailerSidePanelStore).length !== 0) {
+        this.$refs.checkLists[2].checked = true;
+        this.answers.TrailerSidePanel = { state: "pass" };
+      } else {
+        this.$refs.checkLists[2].checked = false;
+      }
+      if (Object.keys(tyresStore).length !== 0) {
+        this.$refs.checkLists[3].checked = true;
+        this.answers.Tyres = { state: "pass" };
+      } else {
+        this.$refs.checkLists[3].checked = false;
+      }
+      if (Object.keys(loadSheetStore).length !== 0) {
+        this.$refs.checkLists[4].checked = true;
+        this.answers.LoadSheet = { state: "pass" };
+      } else {
+        this.$refs.checkLists[4].checked = false;
+      }
+
+
+     
+      if (this.checkLists.length ===  Object.keys(this.answers).length) {
+        this.isAllAnswered = true;
+      }
     });
 
-    this.pageTitle = checklist.Name;
-    this.checklist = checklist;
-    this.imei = this.$f7route.query.imei;
+    //this.isAllAnswered = true;
+    this.checkLists = checkLists;
+     this.selectedAsset = this.$f7route.query.imei;
 
-    let asset = this.info.Devices.find((device) => device.IMEI === this.imei);
 
-    this.assetId = asset.ID;
+ 
+
+    let asset = this.info.Devices.find((device) => device.IMEI === this.selectedAsset);
+
+    
+     
+    
     this.assetName = asset.Name;
+
+
+     
   },
 };
 </script>

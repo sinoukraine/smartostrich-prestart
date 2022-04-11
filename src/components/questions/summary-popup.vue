@@ -36,6 +36,31 @@
           <f7-icon slot="media" icon="f7-icons icon-other-checklist text-color-lightgray"></f7-icon>
         </f7-list-item>
         <f7-list-item
+          :title="$ml.get('TRIPS_MSG018')"
+          :after="pageTitle"
+        >
+          <f7-icon slot="media" icon="f7-icons icon-address text-color-lightgray"></f7-icon>
+        </f7-list-item>
+
+         <f7-list-item
+          :title="$ml.get('HOME_MSG003')"
+          :after="pageTitle"
+        >
+          <f7-icon slot="media" icon="f7-icons icon-profile-name text-color-lightgray"></f7-icon>
+        </f7-list-item>
+        <f7-list-item
+          :title="$ml.get('HOME_MSG014')"
+          :after="pageTitle"
+        >
+          <f7-icon slot="media" icon="f7-icons icon-profile-name text-color-lightgray"></f7-icon>
+        </f7-list-item>
+        <f7-list-item
+          :title="$ml.get('HOME_MSG015')"
+          :after="pageTitle"
+        >
+          <f7-icon slot="media" icon="f7-icons icon-address text-color-lightgray"></f7-icon>
+        </f7-list-item>
+        <f7-list-item
           :title="$ml.get('QUESTIONS_MSG014')"
           :after="info.User.FirstName + ' ' + info.User.SubName"
         >
@@ -117,16 +142,24 @@
       popupOpen(){
         var summary = {
           pass: 0,  //pass
-          na: 0,  //na
+         // na: 0,  //na
           fail: 0,  //fault
         };
 
+
+        
         // counting answers states
         for (const key of Object.keys(this.answers)) {
+           
           summary[this.answers[key].state]++;
         }
-        this.pageTitle = this.checklist.Name;
+
+        
+        // this.pageTitle = this.checklist.Name;
         this.summary = summary;
+
+ 
+        
       },
       async submitHandler() {
 
@@ -134,7 +167,7 @@
           MinorToken: this.info.MinorToken,
           MajorToken: this.info.MajorToken,
 
-          CheckCode: this.checklist.Code,
+          CheckCode: '42', //this.checklist.Code
           IMEI: this.imei,
           Options: []
         };

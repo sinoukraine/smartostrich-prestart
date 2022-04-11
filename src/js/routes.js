@@ -32,7 +32,8 @@ var routes = [
     {
         path: '/check-list/',
         name: 'check-list',
-        component: CheckList
+        component: CheckList,
+        
     },
     {
         path: '/trips/',
