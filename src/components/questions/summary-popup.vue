@@ -37,35 +37,32 @@
         </f7-list-item>
         <f7-list-item
           :title="$ml.get('TRIPS_MSG018')"
-          :after="pageTitle"
+          :after="tripType"
         >
           <f7-icon slot="media" icon="f7-icons icon-address text-color-lightgray"></f7-icon>
         </f7-list-item>
 
          <f7-list-item
           :title="$ml.get('HOME_MSG003')"
-          :after="pageTitle"
+          :after="info.User.FirstName + ' ' + info.User.SubName"
         >
           <f7-icon slot="media" icon="f7-icons icon-profile-name text-color-lightgray"></f7-icon>
         </f7-list-item>
         <f7-list-item
+          v-show="isBusinessTrip"
           :title="$ml.get('HOME_MSG014')"
           :after="pageTitle"
         >
           <f7-icon slot="media" icon="f7-icons icon-profile-name text-color-lightgray"></f7-icon>
         </f7-list-item>
         <f7-list-item
+          v-show="isBusinessTrip"
           :title="$ml.get('HOME_MSG015')"
           :after="pageTitle"
         >
           <f7-icon slot="media" icon="f7-icons icon-address text-color-lightgray"></f7-icon>
         </f7-list-item>
-        <f7-list-item
-          :title="$ml.get('QUESTIONS_MSG014')"
-          :after="info.User.FirstName + ' ' + info.User.SubName"
-        >
-          <f7-icon slot="media" icon="f7-icons icon-profile-name text-color-lightgray"></f7-icon>
-        </f7-list-item>
+    
       </f7-list>
 
       <f7-block-title class="text-uppercase text-align-center">{{$ml.get('QUESTIONS_MSG007')}}</f7-block-title>
@@ -98,7 +95,8 @@
 
 <script>
   import {mapGetters,mapActions} from 'vuex'
-
+  import moment from "moment";
+  import tFormat from "../../js/helpers/time-formats";
 
   export default {
     name: "summary-popup",
@@ -127,6 +125,9 @@
     data: () => ({
       pageTitle: 'Summary',
       summary: {},
+      allAnswers: {},
+      tripType: '',
+      isBusinessTrip: false
     }),
     computed: {
       ...mapGetters(['info'])
@@ -140,18 +141,36 @@
         this.$emit('closeCheckList')
       },
       popupOpen(){
+        let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
+         
+
+         if(additionalFlags.Trip.TripType === '1') {
+            this.tripType = this.$ml.get("COM_MSG014")
+            this.isBusinessTrip = true
+         } else {
+            this.tripType = this.$ml.get("COM_MSG015")
+            this.isBusinessTrip = false
+         }
+
         var summary = {
           pass: 0,  //pass
          // na: 0,  //na
           fail: 0,  //fault
         };
 
-
+        this.allAnswers = {
+            ...this.answers.PanelDamaged,
+            ...this.answers.TrailerFloor,
+            ...this.answers.TrailerSidePanel,
+            ...this.answers.Tyres,
+            ...this.answers.LoadSheet  
+        }
         
         // counting answers states
-        for (const key of Object.keys(this.answers)) {
+        for (const key of Object.keys(this.allAnswers)) {
            
-          summary[this.answers[key].state]++;
+          summary[this.allAnswers[key].state]++;
         }
 
         
@@ -167,18 +186,22 @@
           MinorToken: this.info.MinorToken,
           MajorToken: this.info.MajorToken,
 
-          CheckCode: '42', //this.checklist.Code
+          CheckCode: '00bbf332-d92a-4cbe-97d5-6f2722cf9bd1', //this.checklist.Code  
           IMEI: this.imei,
           Options: []
         };
 
-        for (const key of Object.keys(this.answers)) {
+          
+           
+            
+        for (const key of Object.keys( this.allAnswers)) {
+      
           data.Options.push({
             OptionCode: key,
-            Result: this.answers[key].state,
-            Photos: this.answers[key].img || '',
+            Result:  this.allAnswers[key].state,
+            Photos:  this.allAnswers[key].img || '',
             //ReasonCode: this.answers[key].reasonCode || '',
-            message: this.answers[key].notes || ''
+            message:  this.allAnswers[key].notes || ''
           })
         }
 
@@ -192,9 +215,97 @@
           if(!result){
             return
           }
-          this.$emit('selectTripType',{TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
+
+           this.startTrip({TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
+
+         // this.$emit('selectTripType',{TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
         } catch (e) {this.$f7.progressbar.hide();}
       },
+    async  startTrip(params) {
+         let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
+          let data = {
+                  MinorToken: this.info.MinorToken,
+                  MajorToken: this.info.MajorToken,
+
+                  TaskCode: params.TaskCode,
+                  TripType: additionalFlags.Trip.TripType,
+                };
+
+                
+           
+
+
+
+
+                try {
+                  this.$f7.progressbar.show();
+                  let result = await this.$store.dispatch("START_TRIP", data);
+                  this.$f7.progressbar.hide();
+                  if (!result) {
+                    return;
+                  }
+                } catch (e) {
+                  this.$f7.progressbar.hide();
+                }
+           
+
+                this.$store.dispatch("updateCurrentTrip", obj);
+
+                this.$f7.methods.customDialog({
+                  text: this.$ml.get("PROMPT_MSG033"),
+                });
+
+
+
+                let obj = {
+                  isTripStarted: true,
+                  Trip: {
+                    AssetName: this.assetName,
+                    AssetId: this.assetId,
+                    IMEI: this.imei,
+                    StartTime: moment(params.UpdateTime).format(tFormat[0]),
+                    TaskCode: params.TaskCode,
+                    TripType: additionalFlags.Trip.TripType,
+                  },
+                };
+                
+                this.$f7.methods.setInStorage({
+                  name: "additionalFlags",
+                  data: obj,
+                });
+
+                this.$store.dispatch("SET_NOTIFICATION_STATUS", {
+                  IMEI: this.imei,
+                  MinorToken: this.info.MinorToken,
+                  State: 1,
+                  MobileToken: !localStorage.PUSH_MOBILE_TOKEN
+                    ? "123"
+                    : localStorage.PUSH_MOBILE_TOKEN,
+                  AppKey: !localStorage.PUSH_APP_KEY
+                    ? "123"
+                    : localStorage.PUSH_APP_KEY,
+                  Token: !localStorage.PUSH_DEVICE_TOKEN
+                    ? "123"
+                    : localStorage.PUSH_DEVICE_TOKEN,
+                  Type: !localStorage.DEVICE_TYPE
+                    ? "webapp"
+                    : localStorage.DEVICE_TYPE,
+                });
+                /*if (window.BackgroundGeolocation) {
+                    window.BackgroundGeolocation.setConfig({
+                      params: {
+                        //Token: userInfo.token,
+                      }
+                    }).then(state => {
+                      window.BackgroundGeolocation.start().then(state => {
+                        this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));
+                      })
+                    }).catch(error => {
+                      console.log('- BackgroundGeolocation error: ', error);
+                    });
+                  }*/
+      }
 
     }
   }

@@ -84,6 +84,7 @@
   "PROMPT_MSG039": "MB",
   "PROMPT_MSG040": "You have successfully submitted Accident report",
   "PROMPT_MSG041": "Image size too large, please try another",
+  "PROMPT_MSG042": "Select Trip Type first",
 
   "SIDEBAR_MSG001": "Home",
   "SIDEBAR_MSG002": "My Trips",
@@ -105,7 +106,11 @@
   "HOME_MSG012": "Duration",
   "HOME_MSG013": "Accident report",
   "HOME_MSG014": "Customer Name",  
-  "HOME_MSG015": "Customer Address",
+  "HOME_MSG015": "Customer Address", 
+  "HOME_MSG016": "General Notes",
+  "HOME_MSG017": "Take picture of the stock before completing delivery note",
+  "HOME_MSG018": "Arrival: picture of stock on the delivery note",
+
 
   "QUESTIONS_MSG001": "Yes",
   "QUESTIONS_MSG002": "N/A",

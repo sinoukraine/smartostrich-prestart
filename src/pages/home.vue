@@ -95,7 +95,19 @@
               icon="f7-icons size-25 icon-trip-time text-color-lightgray"
             ></f7-icon>
           </f7-list-item>
+          
         </f7-list>
+         <f7-block-header>{{ $ml.get("HOME_MSG016") }}</f7-block-header>
+         <f7-list>
+          <f7-list-input
+            label="..."    
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons size-25 icon-other-notes text-color-lightgray"
+            ></f7-icon>
+          </f7-list-input>
+         </f7-list>
         <f7-block>
           <f7-link
             :href="`/accident-report/?imei=${selectedAsset}`"
@@ -190,8 +202,8 @@
           </f7-list-item> -->
 
           <f7-list-item
-            link 
-             @click="showCheckList"
+            link
+            @click="showCheckList"
             class="item-input custom-smart-select-wrapper"
           >
             <f7-icon
@@ -212,40 +224,36 @@
             ></f7-icon>
           </f7-list-item>
 
-
           <f7-list-item
-          :title="$ml.get('HOME_MSG009')"
-          @click="selectTripType"
+            :title="$ml.get('HOME_MSG009')"
+            @click="selectTripType"
+            :after="selectedTrip"
           >
-
-           <f7-icon
+            <f7-icon
               slot="media"
               icon="f7-icons icon-menu-trips text-color-lightgray"
             ></f7-icon>
-          
           </f7-list-item>
           <f7-list-input
-             :label="$ml.get('HOME_MSG014')"
-             type="text"
-             :placeholder="$ml.get('HOME_MSG014')"
-              
+            v-show="isBusinessTrip"
+            :label="$ml.get('HOME_MSG014')"
+            type="text"
+            :placeholder="$ml.get('HOME_MSG014')"
             v-model="customerName"
           >
-          <f7-icon
-          
+            <f7-icon
               slot="media"
               icon="f7-icons icon-profile-name text-color-lightgray"
             ></f7-icon>
-          
           </f7-list-input>
           <f7-list-input
+            v-show="isBusinessTrip"
             :label="$ml.get('HOME_MSG015')"
-             type="text"
-             :placeholder="$ml.get('HOME_MSG015')"
-              v-model="customerAddress"
+            type="text"
+            :placeholder="$ml.get('HOME_MSG015')"
+            v-model="customerAddress"
           >
-              <f7-icon
-          
+            <f7-icon
               slot="media"
               icon="f7-icons icon-address text-color-lightgray"
             ></f7-icon>
@@ -258,7 +266,6 @@
               <i class="f7-icons size-25 icon-address text-color-blue"></i>
             </div>
           </f7-list-input>
-
         </f7-list>
       </template>
 
@@ -311,7 +318,9 @@ export default {
       firstName: "",
       lastName: "",
       customerAddress: "",
-      customerName: ""
+      customerName: "",
+      isBusinessTrip: false,
+      selectedTrip: "",
 
       //tripTypeText: enumTripTypes
       //user: this.$f7route.context.user,
@@ -414,27 +423,34 @@ export default {
         this.$f7.methods.setNotificationList([json])
       },*/
 
-
-      selectTripType(params) {
-        var modalTex = `
-                    <div class="custom-modal-text margin-bottom">${ this.$ml.get('PROMPT_MSG010') }</div>
+    selectTripType(params) {
+      var modalTex = `
+                    <div class="custom-modal-text margin-bottom">${this.$ml.get(
+                      "PROMPT_MSG010"
+                    )}</div>
                     <div class="list no-margin no-hairlines text-color-black">
                         <ul>
                             <li>
                                 <label class="item-radio item-content color-custom">
-                                    <input type="radio" name="trip-type" value="1"  checked/>
+                                    <input type="radio" name="trip-type"
+                                    
+                                    value="1"  />
                                     <i class="icon icon-radio"></i>
                                     <div class="item-inner">
-                                        <div class="item-title">${ this.$ml.get('COM_MSG014') }</div>
+                                        <div class="item-title">${this.$ml.get(
+                                          "COM_MSG014"
+                                        )}</div>
                                     </div>
                                 </label>
                             </li>
                              <li>
                                 <label class="item-radio item-content color-custom">
-                                    <input type="radio" name="trip-type" value="2"  />
+                                    <input type="radio" name="trip-type" value="2"/>
                                     <i class="icon icon-radio"></i>
                                     <div class="item-inner">
-                                        <div class="item-title">${ this.$ml.get('COM_MSG015') }</div>
+                                        <div class="item-title">${this.$ml.get(
+                                          "COM_MSG015"
+                                        )}</div>
                                     </div>
                                 </label>
                             </li>
@@ -443,85 +459,47 @@ export default {
                         </ul>
                     </div>
                 `;
-        this.$f7.methods.customDialog({
-          text: modalTex,
-          buttons:[
-            {
-              text: this.$ml.get('COM_MSG017'),
-              onClick: async (dialog) => {
-                let tripType = dialog.$el.find('input[name="trip-type"]:checked').val();
+      this.$f7.methods.customDialog({
+        text: modalTex,
+        buttons: [
+          {
+            text: this.$ml.get("COM_MSG017"),
+            onClick: async (dialog) => {
+              let tripType = dialog.$el
+                .find('input[name="trip-type"]:checked')
+                .val();
 
-                if (tripType !== '3') { //diagnostic
-                  let data = {
-                    MinorToken: this.info.MinorToken,
-                    MajorToken: this.info.MajorToken,
-
-                    TaskCode: params.TaskCode,
-                    TripType: tripType
-                  };
-                  try {
-                    this.$f7.progressbar.show();
-                    let result = await this.$store.dispatch('START_TRIP', data);
-                    this.$f7.progressbar.hide();
-                    if (!result) {
-                      return
-                    }
-                  } catch (e) {this.$f7.progressbar.hide();}
-
-                  let obj = {
-                    isTripStarted: true,
-                    Trip: {
-                      AssetName: this.assetName,
-                      AssetId: this.assetId,
-                      IMEI: this.imei,
-                      StartTime: moment(params.UpdateTime).format(tFormat[0]),
-                      TaskCode: params.TaskCode,
-                      TripType: tripType,
-                    }
-                  };
-
-                  this.$f7.methods.setInStorage({
-                    name: 'additionalFlags',
-                    data: obj
-                  });
-
-                  this.$store.dispatch('updateCurrentTrip', obj)
-
-                  this.$f7.methods.customDialog({
-                    text: this.$ml.get('PROMPT_MSG033'),
-                  })
-
-                  this.$store.dispatch('SET_NOTIFICATION_STATUS', {
-                    IMEI: this.imei,
-                    MinorToken: this.info.MinorToken,
-                    State: 1,
-                    MobileToken: !localStorage.PUSH_MOBILE_TOKEN ? '123' : localStorage.PUSH_MOBILE_TOKEN,
-                    AppKey: !localStorage.PUSH_APP_KEY ? '123' : localStorage.PUSH_APP_KEY,
-                    Token: !localStorage.PUSH_DEVICE_TOKEN ? '123' : localStorage.PUSH_DEVICE_TOKEN,
-                    Type: !localStorage.DEVICE_TYPE ? 'webapp' : localStorage.DEVICE_TYPE,
-                  })
-                  /*if (window.BackgroundGeolocation) {
-                    window.BackgroundGeolocation.setConfig({
-                      params: {
-                        //Token: userInfo.token,
-                      }
-                    }).then(state => {
-                      window.BackgroundGeolocation.start().then(state => {
-                        this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));
-                      })
-                    }).catch(error => {
-                      console.log('- BackgroundGeolocation error: ', error);
-                    });
-                  }*/
-
-                }
-                this.$f7.view.main.router.back();
-               
+              if (tripType === "1") {
+                this.isBusinessTrip = true;
+                this.selectedTrip = this.$ml.get("COM_MSG014");
+              } else {
+                this.isBusinessTrip = false;
+                this.selectedTrip = this.$ml.get("COM_MSG015");
               }
-            }
-          ]
-        })
-      },
+
+              let obj = {
+                isTripStarted: false,
+                Trip: {
+                  // AssetName: this.assetName,
+                  // AssetId: this.assetId,
+                  // IMEI: this.imei,
+                  // StartTime: moment(params.UpdateTime).format(tFormat[0]),
+                  // TaskCode: params.TaskCode,
+                  TripType: tripType,
+                },
+              };
+
+              this.$f7.methods.setInStorage({
+                name: "additionalFlags",
+                data: obj,
+              });
+
+         
+            },
+          },
+        ],
+      });
+    },
 
     showCheckList() {
       if (!this.selectedCheckList) {
@@ -540,6 +518,14 @@ export default {
         return;
       }
 
+      if(!this.selectedTrip) {
+         this.$f7.methods.customDialog({
+          title: this.pageTitle,
+          text: this.$ml.get("PROMPT_MSG042"),
+        });
+        return;
+      }
+
       /*this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));*/
 
       this.$f7router.navigate({
@@ -548,6 +534,7 @@ export default {
           imei: this.selectedAsset,
           cheklist: this.selectedCheckList,
           isDriver: this.isDriver,
+          
         },
       });
     },

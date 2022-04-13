@@ -28,11 +28,11 @@
     <summary-popup
       :openPopup="isSummaryPopupOpen"
       :answers="answers"
-      :imei="imei"
+      :imei="selectedAsset"
       :assetName="assetName"
       @closePopup="isSummaryPopupOpen = false"
       @closeCheckList="closeCheckList"
-      @selectTripType="selectTripType"
+      
     />
     <f7-list>
       <f7-list-item
@@ -132,8 +132,7 @@ export default {
         });
         return;
       }
-
-      console.log(this.chekedList);
+ 
 
       let answeredKeys = Object.keys(this.chekedList);
       if (answeredKeys.length === this.checkLists.length) {
@@ -225,77 +224,77 @@ export default {
 
               if (tripType !== "3") {
                 //diagnostic
-                let data = {
-                  MinorToken: this.info.MinorToken,
-                  MajorToken: this.info.MajorToken,
+                // let data = {
+                //   MinorToken: this.info.MinorToken,
+                //   MajorToken: this.info.MajorToken,
 
-                  TaskCode: params.TaskCode,
-                  TripType: tripType,
-                };
-                try {
-                  this.$f7.progressbar.show();
-                  let result = await this.$store.dispatch("START_TRIP", data);
-                  this.$f7.progressbar.hide();
-                  if (!result) {
-                    return;
-                  }
-                } catch (e) {
-                  this.$f7.progressbar.hide();
-                }
+                //   TaskCode: params.TaskCode,
+                //   TripType: tripType,
+                // };
+                // try {
+                //   this.$f7.progressbar.show();
+                //   let result = await this.$store.dispatch("START_TRIP", data);
+                //   this.$f7.progressbar.hide();
+                //   if (!result) {
+                //     return;
+                //   }
+                // } catch (e) {
+                //   this.$f7.progressbar.hide();
+                // }
 
-                let obj = {
-                  isTripStarted: true,
-                  Trip: {
-                    AssetName: this.assetName,
-                    AssetId: this.assetId,
-                    IMEI: this.imei,
-                    StartTime: moment(params.UpdateTime).format(tFormat[0]),
-                    TaskCode: params.TaskCode,
-                    TripType: tripType,
-                  },
-                };
+                // let obj = {
+                //   isTripStarted: true,
+                //   Trip: {
+                //     AssetName: this.assetName,
+                //     AssetId: this.assetId,
+                //     IMEI: this.imei,
+                //     StartTime: moment(params.UpdateTime).format(tFormat[0]),
+                //     TaskCode: params.TaskCode,
+                //     TripType: tripType,
+                //   },
+                // };
 
-                this.$f7.methods.setInStorage({
-                  name: "additionalFlags",
-                  data: obj,
-                });
+                // this.$f7.methods.setInStorage({
+                //   name: "additionalFlags",
+                //   data: obj,
+                // });
 
-                this.$store.dispatch("updateCurrentTrip", obj);
+                // this.$store.dispatch("updateCurrentTrip", obj);
 
-                this.$f7.methods.customDialog({
-                  text: this.$ml.get("PROMPT_MSG033"),
-                });
+                // this.$f7.methods.customDialog({
+                //   text: this.$ml.get("PROMPT_MSG033"),
+                // });
 
-                this.$store.dispatch("SET_NOTIFICATION_STATUS", {
-                  IMEI: this.imei,
-                  MinorToken: this.info.MinorToken,
-                  State: 1,
-                  MobileToken: !localStorage.PUSH_MOBILE_TOKEN
-                    ? "123"
-                    : localStorage.PUSH_MOBILE_TOKEN,
-                  AppKey: !localStorage.PUSH_APP_KEY
-                    ? "123"
-                    : localStorage.PUSH_APP_KEY,
-                  Token: !localStorage.PUSH_DEVICE_TOKEN
-                    ? "123"
-                    : localStorage.PUSH_DEVICE_TOKEN,
-                  Type: !localStorage.DEVICE_TYPE
-                    ? "webapp"
-                    : localStorage.DEVICE_TYPE,
-                });
-                /*if (window.BackgroundGeolocation) {
-                    window.BackgroundGeolocation.setConfig({
-                      params: {
-                        //Token: userInfo.token,
-                      }
-                    }).then(state => {
-                      window.BackgroundGeolocation.start().then(state => {
-                        this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));
-                      })
-                    }).catch(error => {
-                      console.log('- BackgroundGeolocation error: ', error);
-                    });
-                  }*/
+                // this.$store.dispatch("SET_NOTIFICATION_STATUS", {
+                //   IMEI: this.imei,
+                //   MinorToken: this.info.MinorToken,
+                //   State: 1,
+                //   MobileToken: !localStorage.PUSH_MOBILE_TOKEN
+                //     ? "123"
+                //     : localStorage.PUSH_MOBILE_TOKEN,
+                //   AppKey: !localStorage.PUSH_APP_KEY
+                //     ? "123"
+                //     : localStorage.PUSH_APP_KEY,
+                //   Token: !localStorage.PUSH_DEVICE_TOKEN
+                //     ? "123"
+                //     : localStorage.PUSH_DEVICE_TOKEN,
+                //   Type: !localStorage.DEVICE_TYPE
+                //     ? "webapp"
+                //     : localStorage.DEVICE_TYPE,
+                // });
+                // /*if (window.BackgroundGeolocation) {
+                //     window.BackgroundGeolocation.setConfig({
+                //       params: {
+                //         //Token: userInfo.token,
+                //       }
+                //     }).then(state => {
+                //       window.BackgroundGeolocation.start().then(state => {
+                //         this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));
+                //       })
+                //     }).catch(error => {
+                //       console.log('- BackgroundGeolocation error: ', error);
+                //     });
+                //   }*/
               }
               this.$f7.view.main.router.back();
               this.isSummaryPopupOpen = false;
@@ -312,37 +311,37 @@ export default {
       this.$f7.methods.getFromStorage("trailerSidePanel");
     let tyresStore = this.$f7.methods.getFromStorage("tyres");
     let loadSheetStore = this.$f7.methods.getFromStorage("loadSheet");
-    let checkedCount = 0;
-
+   
+    
     this.$nextTick(() => {
       if (Object.keys(panelDamageStore).length !== 0) {
         this.$refs.checkLists[0].checked = true;
-        this.answers.PanelDamaged = { state: "pass" };
+        this.answers.PanelDamaged = panelDamageStore;
       } else {
         this.$refs.checkLists[0].checked = false;
       }
       if (Object.keys(trailerFloorStore).length !== 0) {
         this.$refs.checkLists[1].checked = true;
-        this.answers.TrailerFloor = { state: "pass" };
+        this.answers.TrailerFloor = trailerFloorStore;
       } else {
         this.$refs.checkLists[1].checked = false;
       }
 
       if (Object.keys(trailerSidePanelStore).length !== 0) {
         this.$refs.checkLists[2].checked = true;
-        this.answers.TrailerSidePanel = { state: "pass" };
+        this.answers.TrailerSidePanel = trailerSidePanelStore;
       } else {
         this.$refs.checkLists[2].checked = false;
       }
       if (Object.keys(tyresStore).length !== 0) {
         this.$refs.checkLists[3].checked = true;
-        this.answers.Tyres = { state: "pass" };
+        this.answers.Tyres = tyresStore;
       } else {
         this.$refs.checkLists[3].checked = false;
       }
       if (Object.keys(loadSheetStore).length !== 0) {
         this.$refs.checkLists[4].checked = true;
-        this.answers.LoadSheet = { state: "pass" };
+        this.answers.LoadSheet = loadSheetStore;
       } else {
         this.$refs.checkLists[4].checked = false;
       }
