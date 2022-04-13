@@ -27,7 +27,7 @@ export default {
     GET_ADDRESS_BY_GEOCODER: DOMAIN7+'reverse.php',
     GET_ADDRESS_BY_GEOCODER2: DOMAIN8+'reverse',
     GET_PLAYBACK_ARR_OPTIMISED: DOMAIN4+'playback/v2',
-    GET_ASSETS_LOCATION: DOMAIN1+'QuikTrak/V1/Device/GetPosInfos2',
+    GET_ASSETS_LOCATION: DOMAIN1+'QuikTrak/V1/Device/GetPosInfosDB',
     SET_IMMOBILISATION_NO_PAY: DOMAIN1 + "Quikloc8/V1/asset/RelayNoPay",
 
     EDIT_ACCOUNT: DOMAIN1 + 'QuikTrak/V1/User/Edit',

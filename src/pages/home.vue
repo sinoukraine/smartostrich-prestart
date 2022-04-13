@@ -238,8 +238,10 @@
             v-show="isBusinessTrip"
             :label="$ml.get('HOME_MSG014')"
             type="text"
-            :placeholder="$ml.get('HOME_MSG014')"
-            v-model="customerName"
+             :placeholder="$ml.get('HOME_MSG014')"
+            clear-button
+            :value="customerName"
+             @input="customerName = $event.target.value"
           >
             <f7-icon
               slot="media"
@@ -251,7 +253,9 @@
             :label="$ml.get('HOME_MSG015')"
             type="text"
             :placeholder="$ml.get('HOME_MSG015')"
-            v-model="customerAddress"
+             :value="customerAddress"
+            clear-button
+             @input="customerAddress = $event.target.value"
           >
             <f7-icon
               slot="media"
@@ -260,7 +264,7 @@
 
             <div
               slot="content-end"
-              @click.stop="isMapSelectAssetOpened = true"
+              @click.stop="isMapDeliveryAddressOpened = true"
               class="link margin-right"
             >
               <i class="f7-icons size-25 icon-address text-color-blue"></i>
@@ -275,6 +279,12 @@
         @closePopup="isMapSelectAssetOpened = false"
         @selectAsset="onMapSelectAsset"
       />
+      <map-delivery-address
+        :isOpened="isMapDeliveryAddressOpened"      
+        @closePopup="isMapDeliveryAddressOpened = false"
+        @selectAddress="onMapSelectAddress"
+   
+      />
     </template>
     <template v-else>
       <login-screen />
@@ -285,6 +295,7 @@
 <script>
 import LoginScreen from "../components/login-screen";
 import MapSelectAsset from "../components/map-select-asset";
+import MapDeliveryAddress from "../components/map-delivery-address";
 import { mapGetters, mapActions } from "vuex";
 import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
@@ -311,14 +322,15 @@ export default {
       selectedCheckList: null,
       isDriver: true,
       isMapSelectAssetOpened: false,
+      isMapDeliveryAddressOpened: false,
       isImmobilised:
         localStorage.IMMOBILISATION_STATE &&
         localStorage.IMMOBILISATION_STATE === "on",
       isImmobilisationSupported: false,
       firstName: "",
       lastName: "",
-      customerAddress: "",
-      customerName: "",
+      customerAddress: '',
+      customerName: '',
       isBusinessTrip: false,
       selectedTrip: "",
 
@@ -329,6 +341,7 @@ export default {
   components: {
     LoginScreen,
     MapSelectAsset,
+    MapDeliveryAddress
   },
   computed: {
     ...mapGetters(["isLoggedIn", "info", "currentTrip"]),
@@ -590,6 +603,9 @@ export default {
     onMapSelectAsset(imei) {
       this.selectedAsset = imei;
       //console.log(imei)
+    },
+    onMapSelectAddress(address){
+        this.customerAddress = address;
     },
     async sendImmobilise() {
       let data = {

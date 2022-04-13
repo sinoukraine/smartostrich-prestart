@@ -216,7 +216,7 @@
             return
           }
 
-           this.startTrip({TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
+         this.startTrip({TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
 
          // this.$emit('selectTripType',{TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
         } catch (e) {this.$f7.progressbar.hide();}

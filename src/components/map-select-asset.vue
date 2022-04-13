@@ -205,7 +205,7 @@
       },
       onPopupOpened(){
         this.map.invalidateSize()
-        this.getMyLocation()
+       // this.map.getMyLocation()
         this.getAssetsLocation()
       },
       onPopupClosed(){
@@ -272,13 +272,16 @@
 
         let response = await this.$store.dispatch('GET_ASSETS_LOCATION', { codes })
 
+        
+
         if(!response || !response.length){
           return
         }
         let availableAssets = this.info.Devices.filter(itm => !itm.ContactCode)
-        //console.log(this.info.Devices)
-        //console.log(availableAssets)
+         
         this.assetList = [...parseAssetsLocationData(response, availableAssets)]
+
+        
         if(this.selectedImei){
           this.assetList.find(itm => itm.imei === this.selectedImei).selected = true
         }

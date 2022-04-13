@@ -1,9 +1,12 @@
 import moment from "moment";
 const CurrentTimeZone = moment().utcOffset() / 60;
 export default function (arry, assets) {
+ 
   let newArry = [];
   assets.forEach(itm => {
     let posData = arry.find( assetPosData => assetPosData[1] === itm.IMEI)
+    // console.log(arry)
+    // console.log(itm.IMEI)
     if(!posData){
       return
     }
