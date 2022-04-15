@@ -2,19 +2,31 @@
   <f7-page name="home">
     <template v-if="isLoggedIn">
       <!-- Top Navbar -->
-      <f7-navbar large>
+      <f7-navbar f7-navbar large>
         <f7-nav-left>
           <!--<f7-link icon-ios="f7:menu" icon-aurora="f7:menu" icon-md="material:menu" panel-open="left" @click="createNotification"></f7-link>-->
+
+
           <f7-link
+            v-if="newDelivery"
+            icon="f7-icons size-25 icon-arrow-back"
+            @click="newDelivery = false"
+          ></f7-link>
+          <f7-link
+          v-else
             icon-ios="f7:menu"
             icon-aurora="f7:menu"
             icon-md="material:menu"
             panel-open="left"
           ></f7-link>
+          
         </f7-nav-left>
-        <f7-nav-title sliding>{{ $ml.get("SIDEBAR_MSG001") }}</f7-nav-title>
-        <f7-nav-title-large>{{ $ml.get("SIDEBAR_MSG001") }}</f7-nav-title-large>
 
+      
+        <f7-nav-title sliding>{{ $ml.get("SIDEBAR_MSG001") }}</f7-nav-title>
+        <f7-nav-title-large v-if="newDelivery">{{ $ml.get("COM_MSG039") }}</f7-nav-title-large>
+        <f7-nav-title-large v-else >{{ $ml.get("SIDEBAR_MSG001") }}</f7-nav-title-large>
+        
         <f7-nav-right>
           <f7-link
             icon="f7-icons size-25 icon-header-alarm"
@@ -23,7 +35,105 @@
         </f7-nav-right>
       </f7-navbar>
 
-      <template v-if="currentTrip && currentTrip.isTripStarted">
+
+
+      <template v-if="newDelivery">
+           <f7-toolbar bottom no-shadow class="custom-toolbar">
+          <div class="row width-100 padding-horizontal">
+            <f7-button
+              color="custom"
+              fill
+              class="col text-uppercase"
+              @click="showCheckList"
+              >{{ $ml.get("HOME_MSG005") }}</f7-button
+            >
+          </div>
+        </f7-toolbar>
+
+        <f7-list>
+          <f7-list-item
+            :title="$ml.get('HOME_MSG006')"
+            :after="currentTrip.Trip.AssetName"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons size-25 icon-other-asset text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+       
+
+
+
+           <f7-list-item
+            :title="$ml.get('FAULTS_MSG005')"
+            after="Farmwize CheckSheet "
+          >
+                <f7-icon
+              slot="media"
+              icon="f7-icons icon-other-checklist text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+
+          <f7-list-item
+            :after="firstName + lastName"
+            :title="$ml.get('HOME_MSG003')"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-profile-name text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+
+          <f7-list-item
+            :title="$ml.get('HOME_MSG009')"
+            @click="selectTripType"
+            :after="selectedTrip"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-menu-trips text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+          <f7-list-input
+            v-show="isBusinessTrip"
+            :label="$ml.get('HOME_MSG014')"
+            type="text"
+            :placeholder="$ml.get('HOME_MSG014')"
+            clear-button
+            :value="customerName"
+            @input="customerName = $event.target.value"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-profile-name text-color-lightgray"
+            ></f7-icon>
+          </f7-list-input>
+          <f7-list-input
+            v-show="isBusinessTrip"
+            :label="$ml.get('HOME_MSG015')"
+            type="text"
+            :placeholder="$ml.get('HOME_MSG015')"
+            :value="customerAddress"
+            clear-button
+            @input="customerAddress = $event.target.value"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-address text-color-lightgray"
+            ></f7-icon>
+
+            <div
+              slot="content-end"
+              @click.stop="isMapDeliveryAddressOpened = true"
+              class="link margin-right"
+            >
+              <i class="f7-icons size-25 icon-address text-color-blue"></i>
+            </div>
+          </f7-list-input>
+        </f7-list>
+      </template>
+
+      <template v-else-if="currentTrip && currentTrip.isTripStarted">
         <!--<f7-toolbar bottom no-shadow class="custom-toolbar custom-toolbar-x2">
           <div class="row width-100 padding-horizontal">
             <f7-button
@@ -45,14 +155,22 @@
             <f7-button color="green" fill class="col-100 text-uppercase margin-bottom" @click="endTrip">{{$ml.get('COM_MSG005')}}</f7-button>
           </div>
         </f7-toolbar>-->
-        <f7-toolbar bottom no-shadow class="custom-toolbar">
+        <f7-toolbar bottom no-shadow class="custom-toolbar-x2 custom-toolbar">
           <div class="row width-100 padding-horizontal">
             <f7-button
               color="red"
               fill
-              class="col-100 text-uppercase"
+              class="col-100text-uppercase"
               @click="endTrip"
               >{{ $ml.get("COM_MSG005") }}</f7-button
+            >
+ 
+            <f7-button
+              color="custom"
+              fill
+              class="col-100  margin-vertical  text-uppercase"
+              @click="newDelivery = true; currentTrip = false"
+              >{{ $ml.get("COM_MSG039") }}</f7-button
             >
           </div>
         </f7-toolbar>
@@ -95,19 +213,39 @@
               icon="f7-icons size-25 icon-trip-time text-color-lightgray"
             ></f7-icon>
           </f7-list-item>
-          
         </f7-list>
-         <f7-block-header>{{ $ml.get("HOME_MSG016") }}</f7-block-header>
-         <f7-list>
-          <f7-list-input
-            label="..."    
-          >
+        <f7-block-header>{{ $ml.get("HOME_MSG016") }}</f7-block-header>
+        <f7-list>
+          <f7-list-input 
+          :value="generalNote"
+          @input="generalNote = $event.target.value"
+          label="...">
             <f7-icon
               slot="media"
+
               icon="f7-icons size-25 icon-other-notes text-color-lightgray"
             ></f7-icon>
           </f7-list-input>
-         </f7-list>
+        </f7-list>
+        <div
+        
+         v-for="note of deliveryNotes" :key="note.Code"
+        >
+        <f7-block-header>{{note.Options.Header}}</f7-block-header>
+        <f7-list>
+          <f7-list-item
+            @click="openDeliveryNotePopup(note.Code)"
+            :title="note.Options.Title"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons size-25 icon-other-photo text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+        </f7-list>
+        </div>
+        
+         
         <f7-block>
           <f7-link
             :href="`/accident-report/?imei=${selectedAsset}`"
@@ -118,6 +256,7 @@
           ></f7-link>
         </f7-block>
       </template>
+        
 
       <template v-else>
         <!-- Toolbar-->
@@ -171,35 +310,7 @@
               </option>
             </select>
           </f7-list-item>
-          <!-- 
-          <f7-list-item
-             
-            class="item-input custom-smart-select-wrapper cheklist-smart-select"
-            :title="$ml.get('HOME_MSG002')"
-            smart-select
-            :key="componentKeyChecklist"
-            ref="checklistSmartSelect"
-          >
-            <f7-icon
-              slot="media"
-              icon="f7-icons icon-other-checklist text-color-lightgray"
-            ></f7-icon>
-            <select
-              name="checkLists"
-              v-model="selectedCheckList"
-              required
-              validate
-              @change="showCheckList"
-            >
-              <option
-                v-for="list in checkLists"
-                :key="list.Code"
-                :value="list.Code"
-              >
-                {{ list.Name }}
-              </option>
-            </select>
-          </f7-list-item> -->
+        
 
           <f7-list-item
             link
@@ -238,10 +349,10 @@
             v-show="isBusinessTrip"
             :label="$ml.get('HOME_MSG014')"
             type="text"
-             :placeholder="$ml.get('HOME_MSG014')"
+            :placeholder="$ml.get('HOME_MSG014')"
             clear-button
             :value="customerName"
-             @input="customerName = $event.target.value"
+            @input="customerName = $event.target.value"
           >
             <f7-icon
               slot="media"
@@ -253,9 +364,9 @@
             :label="$ml.get('HOME_MSG015')"
             type="text"
             :placeholder="$ml.get('HOME_MSG015')"
-             :value="customerAddress"
+            :value="customerAddress"
             clear-button
-             @input="customerAddress = $event.target.value"
+            @input="customerAddress = $event.target.value"
           >
             <f7-icon
               slot="media"
@@ -280,10 +391,18 @@
         @selectAsset="onMapSelectAsset"
       />
       <map-delivery-address
-        :isOpened="isMapDeliveryAddressOpened"      
+        :isOpened="isMapDeliveryAddressOpened"
         @closePopup="isMapDeliveryAddressOpened = false"
         @selectAddress="onMapSelectAddress"
-   
+      />
+      <delivery-note-popup
+        :key="notePopupKey"
+        :openPopup="isDeliveryNotePopupOpen"
+        :noteDetails="noteOption"
+        :savedNotes="savedNotes"
+        :savedImg="savedImg"
+        @closePopup="isDeliveryNotePopupOpen = false"
+        @setNote="setNote"
       />
     </template>
     <template v-else>
@@ -301,7 +420,8 @@ import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
 import getDifferenceBTtwoDates from "../js/helpers/get-difference-bt-two-dates";
 import tFormat from "../js/helpers/time-formats";
-
+import DeliveryNotePopup from "../components/delivery-note-popup";
+import deliveryNotes from "../js/helpers/delivery-notes";
 import checkList from "../js/helpers/check-list";
 
 import enumTripTypes from "../js/helpers/enum-trip-types";
@@ -329,10 +449,21 @@ export default {
       isImmobilisationSupported: false,
       firstName: "",
       lastName: "",
-      customerAddress: '',
-      customerName: '',
+      customerAddress: "",
+      customerName: "",
       isBusinessTrip: false,
       selectedTrip: "",
+
+      notePopupKey: 1,
+      isDeliveryNotePopupOpen: false,
+      noteOption: {},
+      //faultSelectedReason: '',
+      savedNotes: "",
+      savedImg: "",
+      deliveryNotes: [],
+      notes: {},
+      generalNote: '',
+      newDelivery: false
 
       //tripTypeText: enumTripTypes
       //user: this.$f7route.context.user,
@@ -341,7 +472,8 @@ export default {
   components: {
     LoginScreen,
     MapSelectAsset,
-    MapDeliveryAddress
+    MapDeliveryAddress,
+    DeliveryNotePopup,
   },
   computed: {
     ...mapGetters(["isLoggedIn", "info", "currentTrip"]),
@@ -398,6 +530,7 @@ export default {
         let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data);
         this.$f7.progressbar.hide();
 
+        console.log(result)
         if (!result) {
           return;
         }
@@ -506,8 +639,6 @@ export default {
                 name: "additionalFlags",
                 data: obj,
               });
-
-         
             },
           },
         ],
@@ -531,12 +662,24 @@ export default {
         return;
       }
 
-      if(!this.selectedTrip) {
-         this.$f7.methods.customDialog({
+      if (!this.selectedTrip) {
+        this.$f7.methods.customDialog({
           title: this.pageTitle,
           text: this.$ml.get("PROMPT_MSG042"),
         });
         return;
+      }
+
+      if (this.customerAddress || this.customerName) {
+        let obj = {
+          CustomerAddress: this.customerAddress,
+          CustomerName: this.customerName,
+        };
+
+        this.$f7.methods.setInStorage({
+          name: "customerInfo",
+          data: obj,
+        });
       }
 
       /*this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));*/
@@ -547,7 +690,6 @@ export default {
           imei: this.selectedAsset,
           cheklist: this.selectedCheckList,
           isDriver: this.isDriver,
-          
         },
       });
     },
@@ -562,6 +704,7 @@ export default {
       this.$f7.progressbar.show();
       let result = await this.$store.dispatch("END_TRIP", data);
       this.$f7.progressbar.hide();
+
       if (!result) {
         return;
       }
@@ -604,8 +747,8 @@ export default {
       this.selectedAsset = imei;
       //console.log(imei)
     },
-    onMapSelectAddress(address){
-        this.customerAddress = address;
+    onMapSelectAddress(address) {
+      this.customerAddress = address;
     },
     async sendImmobilise() {
       let data = {
@@ -648,11 +791,54 @@ export default {
         .duration(dateDifference, "milliseconds")
         .format("d[d] h[h] m[m]");
     },
+    async openDeliveryNotePopup(code) {
+      this.noteOption = this.deliveryNotes.find(
+        (option) => option.Code === code
+      );
+
+      console.log(this.noteOption)
+      //this.faultSelectedReason='';
+      this.savedNotes = "";
+      this.savedImg = "";
+
+      if (this.notes[code]) {
+        //this.faultSelectedReason = this.answers[code].reasonCode;
+        this.savedNotes = this.notes[code].notes;
+        this.savedImg = this.notes[code].img;
+      } else {
+        /*if(this.faultOption.Reasons && this.faultOption.Reasons.length){
+            this.faultSelectedReason = this.faultOption.Reasons[0].Code;
+          }*/
+      }
+
+      //fix to rerender popup and reinit smart select
+      this.notePopupKey += 1;
+      //await Vue.nextTick();
+      await this.$nextTick();
+      this.isDeliveryNotePopupOpen = true;
+    },
+    setNote(noteDetails) {
+      //this.setQuestionState("fail", noteDetails.optionCode, faultDetails);
+
+
+
+      this.notes[noteDetails.optionCode] = {
+        ...noteDetails,
+        
+      };
+ 
+      this.isDeliveryNotePopupOpen = false;
+
+      console.log(this.notes)
+    },
   },
   created() {},
   mounted() {
     this.assetList = this.info.Devices || [];
     this.checkLists = checkList;
+    this.deliveryNotes = deliveryNotes
+
+ 
 
     if (this.assetList.length) {
       let asset = this.assetList.find((itm) => !itm.ContactCode);

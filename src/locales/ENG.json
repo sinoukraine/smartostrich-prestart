@@ -40,6 +40,7 @@
   "COM_MSG036": "Close",
   "COM_MSG037": "Select",
   "COM_MSG038": "Done",
+  "COM_MSG039": "New Delivery",
 
 
   "PROMPT_MSG000": "Error",
@@ -111,6 +112,8 @@
   "HOME_MSG017": "Take picture of the stock before completing delivery note",
   "HOME_MSG018": "Arrival: picture of stock on the delivery note",
   "HOME_MSG019": "Select Address",
+  "HOME_MSG020": "Take a photo of the delivery note to complete your trip",
+  "HOME_MSG021": "Arrival: picture of delivery note",
 
 
   "QUESTIONS_MSG001": "Yes",

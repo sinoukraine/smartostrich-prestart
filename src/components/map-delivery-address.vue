@@ -108,7 +108,7 @@
   import L from 'leaflet';
   import { LMap, LTileLayer, LMarker, LControlLayers, LFeatureGroup, LTooltip, LCircle } from 'vue2-leaflet';
   import {mapGetters} from "vuex";
-  import getAddresByGeocoder from '../js/helpers/get-address-by-geocoder'
+  
 
   export default {
     name: "map-delivery-address",

@@ -194,3 +194,6 @@
 .icon-scan:before {
   content: "\5a";
 }
+.icon-arrow-back:before {
+  content: "\30";
+}

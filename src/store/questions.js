@@ -8,7 +8,7 @@ export default {
      */
     async UPLOAD_TASK({commit, dispatch}, data){
       try {
-        console.log(data)
+        
         let getParams = new URLSearchParams({ MinorToken: data.MinorToken, MajorToken: data.MajorToken });
         const response = await Vue.axios.post(APIMETHODS.URL.UPLOAD_TASK+'?'+getParams.toString(), data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}} );
         console.log(response.data)

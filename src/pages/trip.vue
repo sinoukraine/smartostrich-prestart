@@ -162,6 +162,7 @@
         ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
 
       }else{
+     
         let trip = this.trips.find(trip => trip.EndTime === this.$f7route.query.id );
         ret = {
           Name: trip.AssetName,

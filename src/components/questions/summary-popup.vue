@@ -51,14 +51,14 @@
         <f7-list-item
           v-show="isBusinessTrip"
           :title="$ml.get('HOME_MSG014')"
-          :after="pageTitle"
+          :after="customerName"
         >
           <f7-icon slot="media" icon="f7-icons icon-profile-name text-color-lightgray"></f7-icon>
         </f7-list-item>
         <f7-list-item
           v-show="isBusinessTrip"
           :title="$ml.get('HOME_MSG015')"
-          :after="pageTitle"
+          :after="customerAddress"
         >
           <f7-icon slot="media" icon="f7-icons icon-address text-color-lightgray"></f7-icon>
         </f7-list-item>
@@ -127,7 +127,9 @@
       summary: {},
       allAnswers: {},
       tripType: '',
-      isBusinessTrip: false
+      isBusinessTrip: false,
+      customerAddress: '',
+      customerName: ''
     }),
     computed: {
       ...mapGetters(['info'])
@@ -142,8 +144,13 @@
       },
       popupOpen(){
         let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+        let customerInfo = this.$f7.methods.getFromStorage("customerInfo");
 
          
+          if(customerInfo) {
+            this.customerAddress = customerInfo.CustomerAddress
+            this.customerName = customerInfo.CustomerName
+          }
 
          if(additionalFlags.Trip.TripType === '1') {
             this.tripType = this.$ml.get("COM_MSG014")

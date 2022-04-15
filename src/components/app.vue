@@ -274,6 +274,16 @@ export default {
                     ret = {};
                   }
                   break;
+                case "customerInfo":
+                  str = localStorage.getItem(
+                    "COM.QUIKTRAK.PRESTART.CUSTOMERINFO"
+                  );
+                  if (str) {
+                    ret = JSON.parse(str);
+                  } else {
+                    ret = {};
+                  }
+                  break;
 
                 default:
                   this.dialog.alert(
@@ -334,6 +344,12 @@ export default {
                 case "loadSheet":
                   localStorage.setItem(
                     "COM.QUIKTRAK.PRESTART.LOADSHEETLIST",
+                    JSON.stringify(params.data)
+                  );
+                  break;
+                case "customerInfo":
+                  localStorage.setItem(
+                    "COM.QUIKTRAK.PRESTART.CUSTOMERINFO",
                     JSON.stringify(params.data)
                   );
                   break;
