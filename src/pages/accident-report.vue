@@ -11,7 +11,7 @@
 
     <f7-toolbar bottom no-shadow class="custom-toolbar">
       <div class="row width-100 padding-horizontal">
-        <label for="submit-form-accident-report" class="col button button-fill text-uppercase bg-color-green">
+        <label for="submit-form-accident-report" class="col button button-fill text-uppercase bg-color-custom">
           {{$ml.get('COM_MSG008')}}
         </label>
       </div>
@@ -77,7 +77,7 @@
             required
         >
           <f7-icon slot="media" icon="f7-icons icon-address text-color-lightgray"></f7-icon>
-          <div slot="content-end" @click.stop="isMapSelectAddressOpened = true" class="link margin-right"><i class="f7-icons icon-address text-color-green "></i></div>
+          <div slot="content-end" @click.stop="isMapSelectAddressOpened = true" class="link margin-right"><i class="f7-icons icon-address text-color-blue "></i></div>
         </f7-list-input>
         <f7-list-input
             :label="$ml.get('ACCIDENT_REPORT_MSG013')"
@@ -192,7 +192,7 @@
       <f7-block-title class="display-flex justify-content-space-between align-items-flex-end">
         {{ $ml.get('ACCIDENT_REPORT_MSG015') }}
         <a @click="addOtherDriver" href="#" class="link">
-          <f7-icon f7="plus" class="text-color-green"></f7-icon>
+          <f7-icon f7="plus" class="text-color-blue"></f7-icon>
         </a>
       </f7-block-title>
       <f7-card v-for="(item, index) in otherVehicles" :key="index" >

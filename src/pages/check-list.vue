@@ -149,24 +149,27 @@ export default {
       });
     },
     closeCheckList() {
-      this.$f7.methods.customDialog({
-        title: this.pageTitle,
-        text: this.$ml.get("PROMPT_MSG004"),
-        buttons: [
-          {
-            text: this.$ml.get("COM_MSG003"),
-          },
-          {
-            text: this.$ml.get("COM_MSG002"),
-            onClick: () => {
-              this.isSummaryPopupOpen = false;
+
+
+      this.isSummaryPopupOpen = false;
               this.$f7router.navigate({
                 name: "home",
               });
-            },
-          },
-        ],
-      });
+      // this.$f7.methods.customDialog({
+      //   title: this.pageTitle,
+      //   text: this.$ml.get("PROMPT_MSG004"),
+      //   buttons: [
+      //     {
+      //       text: this.$ml.get("COM_MSG003"),
+      //     },
+      //     {
+      //       text: this.$ml.get("COM_MSG002"),
+      //       onClick: () => {
+              
+      //       },
+      //     },
+      //   ],
+      // });
     },
 
     selectTripType(params) {

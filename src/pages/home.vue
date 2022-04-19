@@ -6,27 +6,28 @@
         <f7-nav-left>
           <!--<f7-link icon-ios="f7:menu" icon-aurora="f7:menu" icon-md="material:menu" panel-open="left" @click="createNotification"></f7-link>-->
 
-
           <f7-link
             v-if="newDelivery"
             icon="f7-icons size-25 icon-arrow-back"
-            @click="newDelivery = false"
+           
           ></f7-link>
           <f7-link
-          v-else
+            v-else
             icon-ios="f7:menu"
             icon-aurora="f7:menu"
             icon-md="material:menu"
             panel-open="left"
           ></f7-link>
-          
         </f7-nav-left>
 
-      
         <f7-nav-title sliding>{{ $ml.get("SIDEBAR_MSG001") }}</f7-nav-title>
-        <f7-nav-title-large v-if="newDelivery">{{ $ml.get("COM_MSG039") }}</f7-nav-title-large>
-        <f7-nav-title-large v-else >{{ $ml.get("SIDEBAR_MSG001") }}</f7-nav-title-large>
-        
+        <f7-nav-title-large v-if="newDelivery">{{
+          $ml.get("COM_MSG039")
+        }}</f7-nav-title-large>
+        <f7-nav-title-large v-else>{{
+          $ml.get("SIDEBAR_MSG001")
+        }}</f7-nav-title-large>
+
         <f7-nav-right>
           <f7-link
             icon="f7-icons size-25 icon-header-alarm"
@@ -35,16 +36,14 @@
         </f7-nav-right>
       </f7-navbar>
 
-
-
       <template v-if="newDelivery">
-           <f7-toolbar bottom no-shadow class="custom-toolbar">
+        <f7-toolbar bottom no-shadow class="custom-toolbar">
           <div class="row width-100 padding-horizontal">
             <f7-button
               color="custom"
               fill
               class="col text-uppercase"
-              @click="showCheckList"
+              @click="startTrip"
               >{{ $ml.get("HOME_MSG005") }}</f7-button
             >
           </div>
@@ -60,15 +59,12 @@
               icon="f7-icons size-25 icon-other-asset text-color-lightgray"
             ></f7-icon>
           </f7-list-item>
-       
 
-
-
-           <f7-list-item
+          <f7-list-item
             :title="$ml.get('FAULTS_MSG005')"
             after="Farmwize CheckSheet "
           >
-                <f7-icon
+            <f7-icon
               slot="media"
               icon="f7-icons icon-other-checklist text-color-lightgray"
             ></f7-icon>
@@ -161,15 +157,16 @@
               color="red"
               fill
               class="col-100text-uppercase"
-              @click="endTrip"
+              @click="endTrip(true)"
               >{{ $ml.get("COM_MSG005") }}</f7-button
             >
- 
+
             <f7-button
               color="custom"
               fill
-              class="col-100  margin-vertical  text-uppercase"
-              @click="newDelivery = true; currentTrip = false"
+              class="col-100 margin-vertical text-uppercase"
+              
+               @click="addNewDelivery"
               >{{ $ml.get("COM_MSG039") }}</f7-button
             >
           </div>
@@ -216,36 +213,32 @@
         </f7-list>
         <f7-block-header>{{ $ml.get("HOME_MSG016") }}</f7-block-header>
         <f7-list>
-          <f7-list-input 
-          :value="generalNote"
-          @input="generalNote = $event.target.value"
-          label="...">
+          <f7-list-input
+            :value="generalNote"
+            @input="generalNote = $event.target.value"
+            label="..."
+          >
             <f7-icon
               slot="media"
-
               icon="f7-icons size-25 icon-other-notes text-color-lightgray"
             ></f7-icon>
           </f7-list-input>
         </f7-list>
-        <div
-        
-         v-for="note of deliveryNotes" :key="note.Code"
-        >
-        <f7-block-header>{{note.Options.Header}}</f7-block-header>
-        <f7-list>
-          <f7-list-item
-            @click="openDeliveryNotePopup(note.Code)"
-            :title="note.Options.Title"
-          >
-            <f7-icon
-              slot="media"
-              icon="f7-icons size-25 icon-other-photo text-color-lightgray"
-            ></f7-icon>
-          </f7-list-item>
-        </f7-list>
+        <div v-for="note of deliveryNotes" :key="note.Code">
+          <f7-block-header>{{ note.Options.Header }}</f7-block-header>
+          <f7-list>
+            <f7-list-item
+              @click="openDeliveryNotePopup(note.Code)"
+              :title="note.Options.Title"
+            >
+              <f7-icon
+                slot="media"
+                icon="f7-icons size-25 icon-other-photo text-color-lightgray"
+              ></f7-icon>
+            </f7-list-item>
+          </f7-list>
         </div>
-        
-         
+
         <f7-block>
           <f7-link
             :href="`/accident-report/?imei=${selectedAsset}`"
@@ -256,7 +249,6 @@
           ></f7-link>
         </f7-block>
       </template>
-        
 
       <template v-else>
         <!-- Toolbar-->
@@ -310,7 +302,6 @@
               </option>
             </select>
           </f7-list-item>
-        
 
           <f7-list-item
             link
@@ -462,8 +453,9 @@ export default {
       savedImg: "",
       deliveryNotes: [],
       notes: {},
-      generalNote: '',
-      newDelivery: false
+      generalNote: "",
+      newDelivery: false,
+      coordsDelivery: []
 
       //tripTypeText: enumTripTypes
       //user: this.$f7route.context.user,
@@ -528,9 +520,11 @@ export default {
         };
         this.$f7.progressbar.show();
         let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data);
+
+        console.log(result, "RESULT");
         this.$f7.progressbar.hide();
 
-        console.log(result)
+        console.log(result);
         if (!result) {
           return;
         }
@@ -674,6 +668,7 @@ export default {
         let obj = {
           CustomerAddress: this.customerAddress,
           CustomerName: this.customerName,
+          CoordsDelivery: this.coordsDelivery,
         };
 
         this.$f7.methods.setInStorage({
@@ -693,49 +688,74 @@ export default {
         },
       });
     },
-    async endTrip() {
-      let data = {
-        MinorToken: this.info.MinorToken,
-        MajorToken: this.info.MajorToken,
+    async endTrip(isFinished) {
+      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
 
-        TaskCode: this.currentTrip.Trip.TaskCode,
-      };
+      if (isFinished) {
+        console.log(isFinished, "isFinished");
 
-      this.$f7.progressbar.show();
-      let result = await this.$store.dispatch("END_TRIP", data);
-      this.$f7.progressbar.hide();
+        let data = {
+          MinorToken: this.info.MinorToken,
+          MajorToken: this.info.MajorToken,
+          isRouteFinished: isFinished,
+          TaskCode:  additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
+        };
+        console.log(data);
 
-      if (!result) {
-        return;
+        this.$f7.progressbar.show();
+        let result = await this.$store.dispatch("END_TRIP", data);
+        this.$f7.progressbar.hide();
+
+
+
+        let tripObj = {
+          isTripStarted: false,
+          Trip: {},
+        };
+        this.$f7.methods.setInStorage({
+          name: "additionalFlags",
+          data: tripObj,
+        });
+        this.$store.dispatch("updateCurrentTrip", tripObj);
+
+        if (!result) {
+          return;
+        }
+
+        this.$store.dispatch("SET_NOTIFICATION_STATUS", {
+          IMEI: this.selectedAsset,
+          MinorToken: this.info.MinorToken,
+          State: 0,
+          MobileToken: !localStorage.PUSH_MOBILE_TOKEN
+            ? "123"
+            : localStorage.PUSH_MOBILE_TOKEN,
+          AppKey: !localStorage.PUSH_APP_KEY
+            ? "123"
+            : localStorage.PUSH_APP_KEY,
+          Token: !localStorage.PUSH_DEVICE_TOKEN
+            ? "123"
+            : localStorage.PUSH_DEVICE_TOKEN,
+          Type: !localStorage.DEVICE_TYPE ? "webapp" : localStorage.DEVICE_TYPE,
+        });
+
+        
+
+        this.$f7router.navigate("/trip/?id=3&getList=true", {
+          context: result.Data,
+        });
+      } else {
+        console.log(isFinished, "isFinished");
+
+        let data = {
+          MinorToken: this.info.MinorToken,
+          MajorToken: this.info.MajorToken,
+          isRouteFinished: isFinished,
+          TaskCode: additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
+        };
+        console.log(data);
+
+        let result = await this.$store.dispatch("END_TRIP", data);
       }
-
-      this.$store.dispatch("SET_NOTIFICATION_STATUS", {
-        IMEI: this.selectedAsset,
-        MinorToken: this.info.MinorToken,
-        State: 0,
-        MobileToken: !localStorage.PUSH_MOBILE_TOKEN
-          ? "123"
-          : localStorage.PUSH_MOBILE_TOKEN,
-        AppKey: !localStorage.PUSH_APP_KEY ? "123" : localStorage.PUSH_APP_KEY,
-        Token: !localStorage.PUSH_DEVICE_TOKEN
-          ? "123"
-          : localStorage.PUSH_DEVICE_TOKEN,
-        Type: !localStorage.DEVICE_TYPE ? "webapp" : localStorage.DEVICE_TYPE,
-      });
-
-      let tripObj = {
-        isTripStarted: false,
-        Trip: {},
-      };
-      this.$f7.methods.setInStorage({
-        name: "additionalFlags",
-        data: tripObj,
-      });
-      this.$store.dispatch("updateCurrentTrip", tripObj);
-
-      this.$f7router.navigate("/trip/?id=3&getList=true", {
-        context: result.Data,
-      });
 
       /*if (window.BackgroundGeolocation) {
           window.BackgroundGeolocation.stop().then(state => {
@@ -747,8 +767,9 @@ export default {
       this.selectedAsset = imei;
       //console.log(imei)
     },
-    onMapSelectAddress(address) {
+    onMapSelectAddress(address, coords) {
       this.customerAddress = address;
+      this.coordsDelivery = coords;
     },
     async sendImmobilise() {
       let data = {
@@ -796,7 +817,7 @@ export default {
         (option) => option.Code === code
       );
 
-      console.log(this.noteOption)
+      console.log(this.noteOption);
       //this.faultSelectedReason='';
       this.savedNotes = "";
       this.savedImg = "";
@@ -820,25 +841,100 @@ export default {
     setNote(noteDetails) {
       //this.setQuestionState("fail", noteDetails.optionCode, faultDetails);
 
-
-
       this.notes[noteDetails.optionCode] = {
         ...noteDetails,
-        
       };
- 
+
       this.isDeliveryNotePopupOpen = false;
 
-      console.log(this.notes)
+      console.log(this.notes);
+    },
+
+    addNewDelivery() {
+      
+      this.endTrip(false);
+      this.newDelivery = true;
+         
+    },
+    async startTrip() {
+
+       if (!this.selectedTrip) {
+        this.$f7.methods.customDialog({
+          title: this.pageTitle,
+          text: this.$ml.get("PROMPT_MSG042"),
+        });
+        return;
+      }
+
+      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+      let customerInfo = this.$f7.methods.getFromStorage("customerInfo")
+
+      let data = {
+        MinorToken: this.info.MinorToken,
+        MajorToken: this.info.MajorToken,
+
+        TaskCode: this.currentTrip.Trip.TaskCode,
+        TripType: additionalFlags.Trip.TripType,
+        DeliveryCustomerName: customerInfo.CustomerName,
+        DeliveryCustomerLat: customerInfo.CoordsDelivery[0],
+        DeliveryCustomerLng: customerInfo.CoordsDelivery[1], 
+      };
+
+      try {
+        this.$f7.progressbar.show();
+        let result = await this.$store.dispatch("START_TRIP", data);
+        this.$f7.progressbar.hide();
+        if (!result) {
+          return;
+        }
+      } catch (e) {
+        this.$f7.progressbar.hide();
+      }
+
+      let obj = {
+        isTripStarted: true,
+        Trip: {
+          AssetName: this.assetName,
+          AssetId: this.assetId,
+          IMEI: this.imei,
+          //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
+          TaskCode: additionalFlags.Trip.TaskCode,
+          TripType: additionalFlags.Trip.TripType,
+        },
+      };
+
+      this.$f7.methods.setInStorage({
+        name: "additionalFlags",
+        data: obj,
+      });
+
+      this.$store.dispatch("SET_NOTIFICATION_STATUS", {
+        IMEI: this.imei,
+        MinorToken: this.info.MinorToken,
+        State: 1,
+        MobileToken: !localStorage.PUSH_MOBILE_TOKEN
+          ? "123"
+          : localStorage.PUSH_MOBILE_TOKEN,
+        AppKey: !localStorage.PUSH_APP_KEY ? "123" : localStorage.PUSH_APP_KEY,
+        Token: !localStorage.PUSH_DEVICE_TOKEN
+          ? "123"
+          : localStorage.PUSH_DEVICE_TOKEN,
+        Type: !localStorage.DEVICE_TYPE ? "webapp" : localStorage.DEVICE_TYPE,
+      });
+
+  
+
+
+      
     },
   },
   created() {},
   mounted() {
+     
+    //setTimeout(this.endTrip, 3000, true)
     this.assetList = this.info.Devices || [];
     this.checkLists = checkList;
-    this.deliveryNotes = deliveryNotes
-
- 
+    this.deliveryNotes = deliveryNotes;
 
     if (this.assetList.length) {
       let asset = this.assetList.find((itm) => !itm.ContactCode);
@@ -855,15 +951,7 @@ export default {
       this.getCurrentTripDuration();
     }
 
-    // setTimeout(() => {
-    //   var checklistSmartSelect = this.$refs.checklistSmartSelect.f7SmartSelect;
-
-    //   var mySmartSelect = this.$f7.smartSelect.create({
-    //     el: ".cheklist-smart-select a",
-
-    //   });
-
-    // }, 1000);
+  
   },
 };
 </script>

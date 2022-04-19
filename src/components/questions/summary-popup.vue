@@ -31,7 +31,7 @@
         </f7-list-item>
         <f7-list-item
           :title="$ml.get('FAULTS_MSG005')"
-          :after="pageTitle"
+          after="Farmwize CheckSheet"
         >
           <f7-icon slot="media" icon="f7-icons icon-other-checklist text-color-lightgray"></f7-icon>
         </f7-list-item>
@@ -132,7 +132,7 @@
       customerName: ''
     }),
     computed: {
-      ...mapGetters(['info'])
+      ...mapGetters(['info', 'currentTrip'])
     },
     methods: {
       ...mapActions(['UPLOAD_TASK']),
@@ -143,6 +143,9 @@
         this.$emit('closeCheckList')
       },
       popupOpen(){
+
+
+        console.log(this.currentTrip, 'currentTrip')
         let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
         let customerInfo = this.$f7.methods.getFromStorage("customerInfo");
 
@@ -198,7 +201,7 @@
           Options: []
         };
 
-          
+    
            
             
         for (const key of Object.keys( this.allAnswers)) {
@@ -222,28 +225,34 @@
           if(!result){
             return
           }
+    
 
-         this.startTrip({TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
+
+          console.log(result, "UPLOAD_TASK")
+           
+
+         this.startTrip({
+           TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
 
          // this.$emit('selectTripType',{TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
         } catch (e) {this.$f7.progressbar.hide();}
       },
     async  startTrip(params) {
          let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+         let customerInfo = this.$f7.methods.getFromStorage("customerInfo")
 
+         
           let data = {
                   MinorToken: this.info.MinorToken,
                   MajorToken: this.info.MajorToken,
 
                   TaskCode: params.TaskCode,
                   TripType: additionalFlags.Trip.TripType,
+                  DeliveryCustomerName: customerInfo.CustomerName,
+                  DeliveryCustomerLat: customerInfo.CoordsDelivery[0],
+                  DeliveryCustomerLng: customerInfo.CoordsDelivery[1],  
+                   
                 };
-
-                
-           
-
-
-
 
                 try {
                   this.$f7.progressbar.show();
@@ -252,20 +261,16 @@
                   if (!result) {
                     return;
                   }
+
+                  console.log(result, "START_TRIP")
                 } catch (e) {
                   this.$f7.progressbar.hide();
                 }
+
+
+                
            
-
-                this.$store.dispatch("updateCurrentTrip", obj);
-
-                this.$f7.methods.customDialog({
-                  text: this.$ml.get("PROMPT_MSG033"),
-                });
-
-
-
-                let obj = {
+              let obj = {
                   isTripStarted: true,
                   Trip: {
                     AssetName: this.assetName,
@@ -276,6 +281,11 @@
                     TripType: additionalFlags.Trip.TripType,
                   },
                 };
+                this.$store.dispatch("updateCurrentTrip", obj);
+
+                
+
+
                 
                 this.$f7.methods.setInStorage({
                   name: "additionalFlags",
@@ -299,19 +309,15 @@
                     ? "webapp"
                     : localStorage.DEVICE_TYPE,
                 });
-                /*if (window.BackgroundGeolocation) {
-                    window.BackgroundGeolocation.setConfig({
-                      params: {
-                        //Token: userInfo.token,
-                      }
-                    }).then(state => {
-                      window.BackgroundGeolocation.start().then(state => {
-                        this.$f7.methods.showToast(this.$ml.get('COM_MSG020'));
-                      })
-                    }).catch(error => {
-                      console.log('- BackgroundGeolocation error: ', error);
-                    });
-                  }*/
+
+               //  this.closePopup()
+                this.closeCheckList()
+ 
+      
+
+              this.$f7.methods.customDialog({
+                  text: this.$ml.get("PROMPT_MSG033"),
+              });
       }
 
     }
