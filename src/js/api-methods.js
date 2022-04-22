@@ -21,6 +21,7 @@ export default {
     GET_TRIPS: DOMAIN1+'prestart/v1/user/QueryTrip',
     GET_FAULTS: DOMAIN1+'prestart/v1/user/QueryTask',
     SUBMIT_ACCIDENT_REPORT: DOMAIN1+'prestart/v1/user/SubmitAccidentEvent',
+    GET_TASKS: DOMAIN1+'/prestart/v1/user/GetAllTaskOfDriver',
 
     GET_TRIPS_IN_PROGRESS: DOMAIN1+'prestart/v1/user/GetLiveTripList',
     GET_PLAYBACK: DOMAIN1+'QuikTrak/V1/Device/GetHisPosArray2',

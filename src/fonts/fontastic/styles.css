@@ -197,3 +197,6 @@
 .icon-arrow-back:before {
   content: "\30";
 }
+.icon-live-trip:before {
+  content: "\31";
+}

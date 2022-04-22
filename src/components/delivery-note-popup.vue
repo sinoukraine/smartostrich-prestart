@@ -131,11 +131,11 @@
       },
       submitHandler(){
         this.$emit('setNote',{
-          optionName: this.noteDetails.Name,
           optionCode: this.noteDetails.Code,
-          //reasonCode: this.selected,
-          notes: this.notes,
-          img: this.img,
+          note: {
+            PhotoNote: this.notes,
+             PhotoPath: this.img,
+          }
         })
       }
     },

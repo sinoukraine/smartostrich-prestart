@@ -165,6 +165,27 @@ export default {
         commit('setError',  e)
         throw e
       }
+    },
+    async GET_TASKS_FROM_API({commit, dispatch}, data){
+      try {
+        const response = await Vue.axios.get(APIMETHODS.URL.GET_TASKS, { params: data } );
+        console.log(response.data)
+        if(response.data.MajorCode === '000' && response.data.Data && Array.isArray(response.data.Data)){
+         // commit('SET_TRIPS', response.data.Data)
+          return response.data.Data
+          /*
+        return response.data.Data;*/
+        }else{
+         // response.data.method = 'get_trips';
+          commit('setApiValidationError', response.data)
+          return false
+        }
+    
+
+      } catch (e) {
+        commit('setError',  e)
+        throw e
+      }
     }
   }
 }

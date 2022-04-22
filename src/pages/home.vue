@@ -9,7 +9,6 @@
           <f7-link
             v-if="newDelivery"
             icon="f7-icons size-25 icon-arrow-back"
-           
           ></f7-link>
           <f7-link
             v-else
@@ -165,18 +164,113 @@
               color="custom"
               fill
               class="col-100 margin-vertical text-uppercase"
-              
-               @click="addNewDelivery"
+              @click="addNewDelivery"
               >{{ $ml.get("COM_MSG039") }}</f7-button
             >
           </div>
         </f7-toolbar>
 
+        <div v-if="!isFirstTrip">
+          <f7-block-header>Trips</f7-block-header>
+          <!--  {{ $ml.get("HOME_MSG022") }} -->
+
+          <f7-list>
+            <f7-list-item
+              v-for="trip of completedTrips"
+              :key="trip.EndTime"
+              class="flex-direction-column align-items-stretch"
+            >
+              <f7-icon
+                slot="media"
+                icon="f7-icons size-25 icon-live-trip text-color-lightgray"
+              ></f7-icon>
+
+              <div class="width-100 flex-direction-column align-items-stretch">
+                <div class="size-12 item-title only-2-rows">
+                 <span>{{trip.DriverCustomerName}}</span>
+                  <div class="item-header text-color-gray">
+                    {{ trip.BeginLocalTime }}
+                  </div>
+                  {{trip.StartAddress}}
+                </div>
+                <div class="item-text margin-half">
+                  <div class="row no-gap">
+                    <div class="col-50">
+                      <f7-icon
+                        slot="media"
+                        icon="f7-icons size-16 icon-trip-time text-color-lightgray"
+                      ></f7-icon>
+                      <span
+                        class="
+                          size-14
+                          vertical-align-middle
+                          margin-left-half
+                          text-color-gray
+                        "
+                        > {{ trip.Runtime }}</span 
+                      >
+                    </div>
+                    <div class="col-50">
+                      <f7-icon
+                        slot="media"
+                        icon="f7-icons size-16 icon-menu-trips text-color-lightgray"
+                      ></f7-icon>
+                      <span
+                        class="
+                          size-14
+                          vertical-align-middle
+                          margin-left-half
+                          text-color-gray
+                        "
+                        >{{ trip.Mileage }}</span
+                      >
+                    </div>
+                    <div class="col-50">
+                      <f7-icon
+                        slot="media"
+                        icon="f7-icons size-16 icon-trip-speed text-color-lightgray"
+                      ></f7-icon>
+                      <span
+                        class="
+                          size-14
+                          vertical-align-middle
+                          margin-left-half
+                          text-color-gray
+                        "
+                        >{{ trip.MaxSpeed }}</span
+                      >
+                    </div>
+                    <div class="col-50">
+                      <f7-icon
+                        slot="media"
+                        icon="f7-icons size-16 icon-trip-speed text-color-lightgray"
+                      ></f7-icon>
+                      <span
+                        class="
+                          size-14
+                          vertical-align-middle
+                          margin-left-half
+                          text-color-gray
+                        "
+                        >{{ trip.AvgSpeed }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="item-title size-12 only-2-rows">
+                  <div class="item-header text-color-gray">{{ trip.EndLocalTime }}</div>
+                  {{trip.EndAddress}}
+                </div>
+              </div>
+            </f7-list-item>
+          </f7-list>
+        </div>
+
         <f7-block-header>{{ $ml.get("HOME_MSG008") }}</f7-block-header>
         <f7-list>
           <f7-list-item
             :title="$ml.get('HOME_MSG006')"
-            :after="currentTrip.Trip.AssetName"
+            :after="currentTrip.Trip.AssetName ? currentTrip.Trip.AssetName : assetName"
           >
             <f7-icon
               slot="media"
@@ -287,10 +381,10 @@
             >
               <i class="f7-icons size-25 icon-address text-color-blue"></i>
             </div>
-            <!-- @click="scanBarCode"  -->
-            <div slot="content-end" class="link margin-right">
+           
+            <!-- <div slot="content-end"  @click="scanBarCode class="link margin-right">
               <i class="f7-icons size-25 icon-scan text-color-blue"></i>
-            </div>
+            </div> -->
             <select name="assetList" v-model="selectedAsset" required validate>
               <option
                 v-for="asset in assetList"
@@ -455,7 +549,10 @@ export default {
       notes: {},
       generalNote: "",
       newDelivery: false,
-      coordsDelivery: []
+      coordsDelivery: [],
+      isFirstTrip: true,
+      completedTrips: [],
+      assetName: ''
 
       //tripTypeText: enumTripTypes
       //user: this.$f7route.context.user,
@@ -497,6 +594,8 @@ export default {
       // if(this.checkLists.length){
       //   this.selectedCheckList = this.checkLists[0].Code
       // }
+
+      this.showTrips();
     },
     async isLoggedIn(val) {
       if (val) {
@@ -521,10 +620,10 @@ export default {
         this.$f7.progressbar.show();
         let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data);
 
-        console.log(result, "RESULT");
+        
         this.$f7.progressbar.hide();
 
-        console.log(result);
+      
         if (!result) {
           return;
         }
@@ -615,16 +714,24 @@ export default {
               } else {
                 this.isBusinessTrip = false;
                 this.selectedTrip = this.$ml.get("COM_MSG015");
+
+                this.$f7.methods.setInStorage({
+                  name: "customerInfo",
+                  data: {},
+                });
               }
+
+              let additionalFlags =
+                this.$f7.methods.getFromStorage("additionalFlags");
 
               let obj = {
                 isTripStarted: false,
                 Trip: {
-                  // AssetName: this.assetName,
+                   AssetName: additionalFlags.Trip.AssetName,
                   // AssetId: this.assetId,
                   // IMEI: this.imei,
                   // StartTime: moment(params.UpdateTime).format(tFormat[0]),
-                  // TaskCode: params.TaskCode,
+                  TaskCode: additionalFlags.Trip.TaskCode,
                   TripType: tripType,
                 },
               };
@@ -664,7 +771,7 @@ export default {
         return;
       }
 
-      if (this.customerAddress || this.customerName) {
+      if (this.customerAddress && this.customerName) {
         let obj = {
           CustomerAddress: this.customerAddress,
           CustomerName: this.customerName,
@@ -690,37 +797,44 @@ export default {
     },
     async endTrip(isFinished) {
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+      let notesArr = [];
+
+  
+      for (var key in this.notes) {
+        notesArr.push(this.notes[key].note);
+      }
 
       if (isFinished) {
-        console.log(isFinished, "isFinished");
 
         let data = {
+          GenralNote: this.generalNote,
+          Notes: notesArr,
           MinorToken: this.info.MinorToken,
           MajorToken: this.info.MajorToken,
           isRouteFinished: isFinished,
-          TaskCode:  additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
+          TaskCode: additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
         };
-        console.log(data);
+       
 
         this.$f7.progressbar.show();
         let result = await this.$store.dispatch("END_TRIP", data);
         this.$f7.progressbar.hide();
 
+        
 
+        if (!result) {
+          return;
+        }
 
         let tripObj = {
           isTripStarted: false,
-          Trip: {},
+         // Trip: {},
         };
         this.$f7.methods.setInStorage({
           name: "additionalFlags",
           data: tripObj,
         });
         this.$store.dispatch("updateCurrentTrip", tripObj);
-
-        if (!result) {
-          return;
-        }
 
         this.$store.dispatch("SET_NOTIFICATION_STATUS", {
           IMEI: this.selectedAsset,
@@ -738,22 +852,71 @@ export default {
           Type: !localStorage.DEVICE_TYPE ? "webapp" : localStorage.DEVICE_TYPE,
         });
 
-        
-
         this.$f7router.navigate("/trip/?id=3&getList=true", {
           context: result.Data,
+      
         });
+
+              this.$f7.methods.setInStorage({
+                name: 'panelDamage',
+                data: {}
+              });
+          
+       
+            this.$f7.methods.setInStorage({
+                name: 'trailerFloor',
+                data: {}
+              });
+         
+              this.$f7.methods.setInStorage({
+                name: 'trailerSidePanel',
+                data: {}
+              });
+           
+              this.$f7.methods.setInStorage({
+                name: 'tyres',
+                data: {}
+              });
+           
+              this.$f7.methods.setInStorage({
+                name: 'loadSheet',
+                data: {}
+              });
+
+        
       } else {
-        console.log(isFinished, "isFinished");
+
+
+         
+      
+        let tripObj = {
+          isTripStarted: true,
+          Trip: {
+          AssetName:  additionalFlags.Trip.AssetName,
+          AssetId: this.assetId,
+          IMEI: this.selectedAsset,
+          //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
+          TaskCode: additionalFlags.Trip.TaskCode,
+          TripType: additionalFlags.Trip.TripType,
+        },
+        };
+        this.$f7.methods.setInStorage({
+          name: "additionalFlags",
+          data: tripObj,
+        });
+        this.$store.dispatch("updateCurrentTrip", tripObj);
+
 
         let data = {
+          GenralNote: this.generalNote,
+          Notes: notesArr,
           MinorToken: this.info.MinorToken,
           MajorToken: this.info.MajorToken,
           isRouteFinished: isFinished,
           TaskCode: additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
         };
-        console.log(data);
-
+    
+        
         let result = await this.$store.dispatch("END_TRIP", data);
       }
 
@@ -817,7 +980,6 @@ export default {
         (option) => option.Code === code
       );
 
-      console.log(this.noteOption);
       //this.faultSelectedReason='';
       this.savedNotes = "";
       this.savedImg = "";
@@ -840,25 +1002,23 @@ export default {
     },
     setNote(noteDetails) {
       //this.setQuestionState("fail", noteDetails.optionCode, faultDetails);
-
       this.notes[noteDetails.optionCode] = {
         ...noteDetails,
       };
-
       this.isDeliveryNotePopupOpen = false;
-
-      console.log(this.notes);
     },
 
     addNewDelivery() {
-      
       this.endTrip(false);
       this.newDelivery = true;
-         
+      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
+      this.assetName = additionalFlags.Trip.AssetName;
     },
     async startTrip() {
-
-       if (!this.selectedTrip) {
+      this.notes = {}
+      this.generalNote = ""
+      if (!this.selectedTrip) {
         this.$f7.methods.customDialog({
           title: this.pageTitle,
           text: this.$ml.get("PROMPT_MSG042"),
@@ -866,19 +1026,42 @@ export default {
         return;
       }
 
+      if (this.customerAddress || this.customerName) {
+        let obj = {
+          CustomerAddress: this.customerAddress,
+          CustomerName: this.customerName,
+          CoordsDelivery: this.coordsDelivery,
+        };
+
+        this.$f7.methods.setInStorage({
+          name: "customerInfo",
+          data: obj,
+        });
+      }
+
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
-      let customerInfo = this.$f7.methods.getFromStorage("customerInfo")
+      let customerInfo = this.$f7.methods.getFromStorage("customerInfo");
 
-      let data = {
-        MinorToken: this.info.MinorToken,
-        MajorToken: this.info.MajorToken,
+      let data = {};
 
-        TaskCode: this.currentTrip.Trip.TaskCode,
-        TripType: additionalFlags.Trip.TripType,
-        DeliveryCustomerName: customerInfo.CustomerName,
-        DeliveryCustomerLat: customerInfo.CoordsDelivery[0],
-        DeliveryCustomerLng: customerInfo.CoordsDelivery[1], 
-      };
+      if (Object.keys(customerInfo).length == 0) {
+        data = {
+          MinorToken: this.info.MinorToken,
+          MajorToken: this.info.MajorToken,
+          TaskCode: additionalFlags.Trip.TaskCode,
+          TripType: additionalFlags.Trip.TripType,
+        };
+      } else {
+        data = {
+          MinorToken: this.info.MinorToken,
+          MajorToken: this.info.MajorToken,
+          TaskCode: additionalFlags.Trip.TaskCode,
+          TripType: additionalFlags.Trip.TripType,
+          DeliveryCustomerName: customerInfo.CustomerName,
+          DeliveryCustomerLat: customerInfo.CoordsDelivery[0],
+          DeliveryCustomerLng: customerInfo.CoordsDelivery[1],
+        };
+      }
 
       try {
         this.$f7.progressbar.show();
@@ -894,9 +1077,9 @@ export default {
       let obj = {
         isTripStarted: true,
         Trip: {
-          AssetName: this.assetName,
+          AssetName:  additionalFlags.Trip.AssetName,
           AssetId: this.assetId,
-          IMEI: this.imei,
+          IMEI: this.selectedAsset,
           //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
           TaskCode: additionalFlags.Trip.TaskCode,
           TripType: additionalFlags.Trip.TripType,
@@ -907,9 +1090,10 @@ export default {
         name: "additionalFlags",
         data: obj,
       });
+ this.$store.dispatch("updateCurrentTrip", obj);
 
       this.$store.dispatch("SET_NOTIFICATION_STATUS", {
-        IMEI: this.imei,
+        IMEI: this.selectedAsset,
         MinorToken: this.info.MinorToken,
         State: 1,
         MobileToken: !localStorage.PUSH_MOBILE_TOKEN
@@ -922,16 +1106,81 @@ export default {
         Type: !localStorage.DEVICE_TYPE ? "webapp" : localStorage.DEVICE_TYPE,
       });
 
-  
-
-
-      
+      this.newDelivery = false;
+      this.showTrips();
     },
+    async showTrips() {
+      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
+      let params = {
+        MinorToken: this.info.MinorToken,
+        MajorToken: this.info.MajorToken,
+        TaskCode: additionalFlags.Trip.TaskCode,
+      };
+      let items;
+      if(params.TaskCode) {
+         items = await this.$store.dispatch("GET_TRIPS_FROM_API", params);
+      }
+      
+      if (items && items.length) {
+
+
+        for (let trip in items) {
+           
+          if (items[trip].BeginTime) {
+           
+          items[trip].BeginLocalTime = moment(items[trip].BeginTime, "YYYY-MM-DD[T]HH:mm:ss")
+              //.add(self.$app.data.UTCOFFSET, "minutes")
+              .format('YYYY-MM-DD HH:mm:ss');
+          }
+          if (items[trip].EndTime) {
+           items[trip].EndLocalTime = moment(items[trip].EndTime, "YYYY-MM-DD[T]HH:mm:ss")
+              //.add(self.$app.data.UTCOFFSET, "minutes")
+              .format('YYYY-MM-DD HH:mm:ss');
+          }
+
+        if (items[trip].StartLat && items[trip].StartLng) {
+          items[trip].StartAddress = await this.$store.dispatch(
+            "fetchAddress",
+            {
+              lat: items[trip].StartLat,
+              lng: items[trip].StartLng,
+            }
+          );
+        }
+
+        if (items[trip].EndLat && items[trip].EndLng) {
+          items[trip].EndAddress = await this.$store.dispatch(
+            "fetchAddress",
+            {
+              lat: items[trip].EndLat,
+              lng: items[trip].EndLng,
+            }
+          );
+        }
+        }
+
+
+ 
+        
+      }
+
+      this.completedTrips = items;
+
+
+
+ 
+      if (this.completedTrips.length) {
+        this.isFirstTrip = false;
+      }
+    },
+    scanBarCode() {
+
+    }
   },
   created() {},
   mounted() {
-     
-    //setTimeout(this.endTrip, 3000, true)
+    // setTimeout(this.endTrip, 3000, true)
     this.assetList = this.info.Devices || [];
     this.checkLists = checkList;
     this.deliveryNotes = deliveryNotes;
@@ -950,8 +1199,6 @@ export default {
     if (this.currentTrip && this.currentTrip.isTripStarted) {
       this.getCurrentTripDuration();
     }
-
-  
   },
 };
 </script>

@@ -622,7 +622,7 @@ export default {
           } else {
             this.$f7.methods.customDialog({
               title: this.$ml.get("PROMPT_MSG000"),
-              text: this.$ml.get("PROMPT_MSG001"),
+              text:   this.$ml.get("PROMPT_MSG001"),
             });
           }
           break;

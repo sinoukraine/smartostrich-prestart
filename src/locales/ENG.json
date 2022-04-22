@@ -114,6 +114,7 @@
   "HOME_MSG019": "Select Address",
   "HOME_MSG020": "Take a photo of the delivery note to complete your trip",
   "HOME_MSG021": "Arrival: picture of delivery note",
+  "HOME_MSG022": "First trip",
 
 
   "QUESTIONS_MSG001": "Yes",
@@ -156,6 +157,10 @@
   "TRIPS_MSG020": "Show Raw",
   "TRIPS_MSG021": "Show Optimised",
   "TRIPS_MSG022": "Show Last",
+  "TRIPS_MSG023": "Trips",
+  "TRIPS_MSG024": "Photos",
+  "TRIPS_MSG025": "Picture of the stock",
+  "TRIPS_MSG026": "Delivery Note",
 
   "PLAYBACK_MSG000": "Asset Name",
   "PLAYBACK_MSG001": "Position Time",

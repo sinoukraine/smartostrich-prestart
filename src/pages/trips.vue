@@ -107,12 +107,14 @@
         this.vlData = vlData;
       },
       formatItems(items){
+        
         if(items.length){
           items.map((item)=>{
             item.TripTypeText = this.$ml.get(enumTripTypes[item.TripType].path)
           })
           items.sort((a, b) =>  moment(b.BeginTime).unix() - moment(a.BeginTime).unix())
         }
+        
         return items;
       },
       async onChangeCustomPeriod(values){
@@ -121,17 +123,18 @@
             MinorToken: this.info.MinorToken,
             MajorToken: this.info.MajorToken,
 
-            From: moment.utc(values[0]).format(tFormat[1])+'.000Z',
-            To: moment(values[1]).endOf('day').utc().format(tFormat[1])+'.000Z',
+            from: moment.utc(values[0]).format(tFormat[0])+'.000Z',
+            to: moment(values[1]).endOf('day').utc().format(tFormat[0])+'.000Z',
           };
 
           this.loadingTrips = true;
           let items = await this.$store.dispatch('GET_TRIPS_FROM_API', params);
           this.isNoData = !items.length;
-          this.$refs.vlTrips.f7VirtualList.replaceAllItems(this.formatItems(items));
+          this.$refs.vlTrips.f7VirtualList.replaceAllItems(items); // this.formatItems(items)
           this.loadingTrips = false;
         }
-      }
+      },
+    
     },
     watch: {
       async selectedPeriod(val){
@@ -139,20 +142,20 @@
           let params = {
             MinorToken: this.info.MinorToken,
             MajorToken: this.info.MajorToken,
-
-            From: moment().subtract(val, "days").startOf('day').utc().format(tFormat[1])+'.000Z',
-            To: moment().utc().format(tFormat[1])+'.000Z',
+              
+            from: moment().subtract(val, "days").startOf('day').utc().format(tFormat[0])+'.000Z',
+            to: moment().utc().format(tFormat[0])+'.000Z',
           };
           this.loadingTrips = true;
           let items = await this.$store.dispatch('GET_TRIPS_FROM_API', params);
           this.isNoData = !items.length;
-          this.$refs.vlTrips.f7VirtualList.replaceAllItems(this.formatItems(items));
+          this.$refs.vlTrips.f7VirtualList.replaceAllItems(items);// this.formatItems(items)
           this.loadingTrips = false;
         }
       }
     },
     async mounted() {
-
+  
       this.selectedPeriod = 3;
       this.componentKeyPeriod = Date.now();
 
