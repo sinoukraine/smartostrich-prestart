@@ -1,6 +1,16 @@
 <template>
   <f7-page :page-content="false">
-    <f7-navbar :title="pageTitle" back-link="Back"></f7-navbar>
+    
+
+    <f7-navbar>
+  <f7-nav-left>
+  <f7-link
+            icon="f7-icons size-25 icon-header-arrow"
+            href="/trips/"
+          ></f7-link></f7-nav-left>
+  <f7-nav-title>{{pageTitle}}</f7-nav-title>
+ 
+</f7-navbar>
     <f7-toolbar tabbar top>
       <f7-link tab-link="#tab-1" tab-link-active>{{
         $ml.get("TRIPS_MSG001")
@@ -368,59 +378,68 @@ export default {
           );
         }
       }
-
-      
     },
+
+
+    async getPlayBack() {
+
+    }
   },
   async mounted() {
     let ret = {};
     let utcOffset = moment().utcOffset();
-    
 
     if (this.$f7route.context && this.$f7route.context.IMEI) {
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
       let taskCode = additionalFlags.Trip.TaskCode;
 
-
-       
-        ret = {
-          Name: this.$f7route.context.Name,
-          TripStat: {
-            Raiting: "10",
-            Stars: {},
-            Distance: this.$f7route.context.Mileage, //1200,
-            Time: this.$f7route.context.Runtime, //'8:56:23',
-            MaxSpeed: this.$f7route.context.MaxSpeed, //'121 km/h',
-            AvargeSpeed: this.$f7route.context.AvgSpeed, //'87 km/h',
-            FuelUsed: this.$f7route.context.FuelUsed, //'70 L',
-            Start: moment(this.$f7route.context.BeginTime)
-              .add(utcOffset, "minutes")
-              .format(tFormat[0]), //'09.01.2018 1:34 PM ',
-            Finish: moment(this.$f7route.context.EndTime)
-              .add(utcOffset, "minutes")
-              .format(tFormat[0]), //'09.01.2018 4:54 PM',
-            IMEI: this.$f7route.context.IMEI,
-            AssetId: this.$f7route.context.ID,
-            TripType: this.$f7route.context.TripType,
-            SpeedUnit: "km/h",
-            FuelUnit: "L",
-            MileageUnit: "km",
-            TaskCode: this.$f7route.TaskCode,
-          },
-          Gauge: {},
-        };
+      ret = {
+        Name: this.$f7route.context.Name,
+        TripStat: {
+          Raiting: "10",
+          Stars: {},
+          Distance: this.$f7route.context.Mileage, //1200,
+          Time: this.$f7route.context.Runtime, //'8:56:23',
+          MaxSpeed: this.$f7route.context.MaxSpeed, //'121 km/h',
+          AvargeSpeed: this.$f7route.context.AvgSpeed, //'87 km/h',
+          FuelUsed: this.$f7route.context.FuelUsed, //'70 L',
+          Start: moment(this.$f7route.context.BeginTime)
+            .add(utcOffset, "minutes")
+            .format(tFormat[0]), //'09.01.2018 1:34 PM ',
+          Finish: moment(this.$f7route.context.EndTime)
+            .add(utcOffset, "minutes")
+            .format(tFormat[0]), //'09.01.2018 4:54 PM',
+          IMEI: this.$f7route.context.IMEI,
+          AssetId: this.$f7route.context.ID,
+          TripType: this.$f7route.context.TripType,
+          SpeedUnit: "km/h",
+          FuelUnit: "L",
+          MileageUnit: "km",
+          TaskCode: this.$f7route.TaskCode,
+        },
+        Gauge: {},
+      };
       //ret.TripStat.Raiting = trip.Raiting;
       ret.TripStat.Stars = this.$f7.methods.getStars(ret.TripStat.Raiting);
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
 
-
-      this.getTrips(taskCode)
+      this.getTrips(taskCode);
     } else {
-      let trip = this.trips.find(
-        (trip) => trip.EndTime === this.$f7route.query.id
-      );
+       
 
-      ret = {
+      
+
+        let trip = this.trips.find(
+          (trip) => trip.EndTime === this.$f7route.query.id
+        );
+
+
+        
+
+          console.log(this.trips, 'this.trips')
+          console.log(trip, 'trip')
+          console.log(this.$f7route.query.id, 'this.$f7route.query.id')
+       ret = {
         Name: trip.AssetName,
         TripStat: {
           Raiting: "10",
@@ -453,16 +472,26 @@ export default {
       ret.TripStat.Stars = this.$f7.methods.getStars(ret.TripStat.Raiting);
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
 
-       this.getTrips(trip.TaskCode)
+      this.getTrips(trip.TaskCode);
+
+    
+
+
     }
 
+ 
     this.pageTitle = ret.Name;
     this.trip = ret;
     this.loading = false;
 
+      this.$nextTick(() => {
+
+        console.log(ret, 'ret')
+      })
+     
+
     let playbackParams = {
       MinorToken: this.info.MinorToken,
-
       Code: this.trip.TripStat.AssetId,
       From: moment(this.trip.TripStat.Start, tFormat[0])
         .utc()

@@ -448,6 +448,7 @@
             v-show="isBusinessTrip"
             :label="$ml.get('HOME_MSG015')"
             type="text"
+            readonly
             :placeholder="$ml.get('HOME_MSG015')"
             :value="customerAddress"
             clear-button
@@ -727,11 +728,11 @@ export default {
               let obj = {
                 isTripStarted: false,
                 Trip: {
-                   AssetName: additionalFlags.Trip.AssetName,
+                   AssetName: Object.keys(additionalFlags).length  ? additionalFlags.Trip.AssetName : '',
                   // AssetId: this.assetId,
                   // IMEI: this.imei,
                   // StartTime: moment(params.UpdateTime).format(tFormat[0]),
-                  TaskCode: additionalFlags.Trip.TaskCode,
+                  TaskCode: Object.keys(additionalFlags).length  ? additionalFlags.Trip.TaskCode : '',
                   TripType: tripType,
                 },
               };
