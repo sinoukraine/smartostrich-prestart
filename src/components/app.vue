@@ -590,7 +590,7 @@ export default {
           ) {
             this.$f7.methods.customDialog({
               title: this.$ml.get("PROMPT_MSG000"),
-              text: this.$ml.get("PROMPT_MSG032"),
+              text: "You are already driving another vehicle: " + err.Data.UsingAssetName + ". Finish current trip and try again",
             });
           } else {
             this.$f7.methods.customDialog({

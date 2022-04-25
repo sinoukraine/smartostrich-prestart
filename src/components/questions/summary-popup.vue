@@ -225,6 +225,8 @@ export default {
       this.summary = summary;
     },
     async submitHandler() {
+            let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
       let data = {
         MinorToken: this.info.MinorToken,
         MajorToken: this.info.MajorToken,
@@ -247,20 +249,30 @@ export default {
       //this.$emit('summaryResult', data)
 
       try {
-        this.$f7.progressbar.show();
-        let result = await this.$store.dispatch("UPLOAD_TASK", data);
-        this.$f7.progressbar.hide();
-        if (!result) {
-          return;
-        }
 
-        console.log(result, "UPLOAD_TASK");
+        if(!this.info.TaskCode.length || !additionalFlags.Trip.TaskCode) {
+            this.$f7.progressbar.show();
+            let result = await this.$store.dispatch("UPLOAD_TASK", data);
+            this.$f7.progressbar.hide();
+            if (!result) {
+              return;
+            }
 
-        this.startTrip({
+             this.startTrip({
           TaskCode: result.Data.Code,
           UpdateTime: result.Data.UpdateTime,
         });
 
+        } else {
+          console.log('good')
+             this.startTrip({
+                TaskCode: this.info.TaskCode,
+               // UpdateTime: result.Data.UpdateTime,
+              });
+        }
+      
+       
+       
         // this.$emit('selectTripType',{TaskCode: result.Data.Code, UpdateTime: result.Data.UpdateTime})
       } catch (e) {
         this.$f7.progressbar.hide();

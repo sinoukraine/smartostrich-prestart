@@ -32,10 +32,10 @@ export default {
     }*/
     async START_TRIP({commit, dispatch}, data){
       try {
-        console.log(data)
+        
         let getParams = new URLSearchParams({ MinorToken: data.MinorToken, MajorToken: data.MajorToken });
         const response = await Vue.axios.post(APIMETHODS.URL.START_TRIP+'?'+getParams.toString(), data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}} );
-        console.log(response.data)
+      
 
         if(response.data.MajorCode === '000'){
           return response.data
@@ -51,10 +51,10 @@ export default {
     },
     async END_TRIP({commit, dispatch}, data){
       try {
-        console.log(data)
+       
         let getParams = new URLSearchParams({ MinorToken: data.MinorToken, MajorToken: data.MajorToken });
         const response = await Vue.axios.post(APIMETHODS.URL.END_TRIP+'?'+getParams.toString(), data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}} );
-        console.log(response.data)
+ 
 
         if(response.data.MajorCode === '000'){
           return response.data
@@ -88,7 +88,7 @@ export default {
     async GET_PLAYBACK_OPTIMISED({commit, dispatch}, data){
       try {
         const response = await Vue.axios.post(APIMETHODS.URL.GET_PLAYBACK_ARR_OPTIMISED, data, {headers: {'Content-Type': 'application/json'}} );
-        console.log(response.data)
+        
 
         if(response.data.polylines){
           return response.data
@@ -105,10 +105,10 @@ export default {
 
     async GET_TRIPS_IN_PROGRESS({commit, dispatch}, data){
       try {
-        console.log(data)
+ 
         let getParams = new URLSearchParams({ MinorToken: data.MinorToken, MajorToken: data.MajorToken });
         const response = await Vue.axios.post(APIMETHODS.URL.GET_TRIPS_IN_PROGRESS+'?'+getParams.toString(), null, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}} );
-        console.log(response.data)
+ 
 
         if(response.data.MajorCode === '000'){
           return response.data
@@ -126,7 +126,7 @@ export default {
     async GET_TRIPS_FROM_API({commit, dispatch}, data){
       try {
         const response = await Vue.axios.get(APIMETHODS.URL.GET_TRIPS, { params: data } );
-        console.log(response.data)
+  
         if(response.data.MajorCode === '000' && response.data.Data && Array.isArray(response.data.Data)){
           commit('SET_TRIPS', response.data.Data)
           return response.data.Data
@@ -169,7 +169,7 @@ export default {
     async GET_TASKS_FROM_API({commit, dispatch}, data){
       try {
         const response = await Vue.axios.get(APIMETHODS.URL.GET_TASKS, { params: data } );
-        console.log(response.data)
+     
         if(response.data.MajorCode === '000' && response.data.Data && Array.isArray(response.data.Data)){
          // commit('SET_TRIPS', response.data.Data)
           return response.data.Data

@@ -363,6 +363,7 @@
             class="item-input asset-select custom-smart-select-wrapper"
             :title="$ml.get('HOME_MSG001')"
             smart-select
+            ref="assetSelect"
             :smart-select-params="{
               openIn: 'popup',
               searchbar: true,
@@ -382,9 +383,9 @@
               <i class="f7-icons size-25 icon-address text-color-blue"></i>
             </div>
            
-            <!-- <div slot="content-end"  @click="scanBarCode class="link margin-right">
+            <div slot="content-end"  @click="scanBarCode" class="link margin-right">
               <i class="f7-icons size-25 icon-scan text-color-blue"></i>
-            </div> -->
+            </div>  
             <select name="assetList" v-model="selectedAsset" required validate>
               <option
                 v-for="asset in assetList"
@@ -619,11 +620,35 @@ export default {
           MajorToken: this.info.MajorToken,
         };
         this.$f7.progressbar.show();
-        let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data);
-
+        let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data)
         
         this.$f7.progressbar.hide();
 
+
+
+       
+
+        if(this.info.TaskCode.length && this.info.TripId === 0) {
+           let obj = {
+            isTripStarted: true,
+          };
+          this.$store.dispatch("updateCurrentTrip", obj);
+        }  else if (this.info.TaskCode.length && this.info.TripId === -1) {
+            this.newDelivery = true;
+
+            let obj = {
+                isTripStarted: false,
+                Trip: {
+                  TaskCode: this.info.TaskCode,
+                },
+              };
+
+              this.$f7.methods.setInStorage({
+                name: "additionalFlags",
+                data: obj,
+              });
+        }
+        
       
         if (!result) {
           return;
@@ -1111,6 +1136,8 @@ export default {
       this.showTrips();
     },
     async showTrips() {
+
+   
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
 
       let params = {
@@ -1176,6 +1203,17 @@ export default {
       }
     },
     scanBarCode() {
+      if (!navigator.camera) {
+          this.$f7.methods.customDialog({ title: this.$ml.get('PROMPT_MSG000'), text: this.$ml.get('PROMPT_MSG007') });
+          return;
+        }
+        let options = {
+          quality: 50,
+          destinationType: Camera.DestinationType.DATA_URL,
+          sourceType: 1, // 0:Photo Library, 1=Camera, 2=Saved Album
+          encodingType: 0 // 0=JPG 1=PNG
+        };
+
 
     }
   },
@@ -1200,6 +1238,23 @@ export default {
     if (this.currentTrip && this.currentTrip.isTripStarted) {
       this.getCurrentTripDuration();
     }
+    
+    //app.smartSelect.get('.asset-select').setValue(someThing);
+
+
+        this.$nextTick(() => {
+
+
+
+        })
+
+
+      setTimeout(() => {
+                           console.log(this.$refs.assetSelect.f7SmartSelect )
+
+      }, 3000)
+
+    //this.selectedAsset = '0357424100649798'
   },
 };
 </script>

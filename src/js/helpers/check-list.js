@@ -61,7 +61,7 @@ export default [
           "Reasons": [],
           "Code": "23",
           "CheckCode": "2",
-          "Name": "Floor Needs Repairs",
+          "Name": "Floor Dirty or Clean",
           "Memo": "",
           "Order": 99
       },
