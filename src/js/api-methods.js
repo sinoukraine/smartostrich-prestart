@@ -18,6 +18,8 @@ export default {
     GPS_UPLOAD_LINK: 'https://sinopacificukraine.com/test/phonetrack/locations.php',
     START_TRIP: DOMAIN1+'prestart/v1/user/StartTrip',
     END_TRIP: DOMAIN1+'prestart/v1/user/EndTrip',
+    EDIT_TRIP: DOMAIN1+'prestart/V1/user/EditTrip',
+ 
     GET_TRIPS: DOMAIN1+'prestart/v1/user/QueryTrip',
     GET_FAULTS: DOMAIN1+'prestart/v1/user/QueryTask',
     SUBMIT_ACCIDENT_REPORT: DOMAIN1+'prestart/v1/user/SubmitAccidentEvent',
@@ -38,6 +40,7 @@ export default {
     REFRESH_PUSH_TOKEN: DOMAIN1 + "QuikTrak/V1/User/RefreshToken",
     GET_NEW_NOTIFICATIONS: DOMAIN1 + "QuikTrak/V1/Device/Alarms",
     GET_ASSET_DETAILS: DOMAIN1 + "Common/v1/Activation/GetAssetsInfo",
+    UNBIND_ASSET:  DOMAIN1  +   "/prestart/v1/user/UnbindAsset"
   }
 }
 //https://newapi.quiktrak.co/Common/v1/Activation/GetAssetsInfo

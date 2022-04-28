@@ -85,7 +85,10 @@
   "PROMPT_MSG039": "MB",
   "PROMPT_MSG040": "You have successfully submitted Accident report",
   "PROMPT_MSG041": "Image size too large, please try another",
-  "PROMPT_MSG042": "Select Trip Type first",
+  "PROMPT_MSG042": "Select Trip Type first", 
+  "PROMPT_MSG043": "Are you sure you want to cancel your trip?",
+  
+
 
   "SIDEBAR_MSG001": "Home",
   "SIDEBAR_MSG002": "My Trips",
@@ -115,6 +118,8 @@
   "HOME_MSG020": "Take a photo of the delivery note to complete your trip",
   "HOME_MSG021": "Arrival: picture of delivery note",
   "HOME_MSG022": "First trip",
+  "HOME_MSG023": "Accept Changes",
+  "HOME_MSG024": "Back to Trip",
 
 
   "QUESTIONS_MSG001": "Yes",

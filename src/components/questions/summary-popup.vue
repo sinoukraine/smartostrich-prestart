@@ -227,6 +227,10 @@ export default {
     async submitHandler() {
             let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
 
+       if(this.info.boundAsset.length) {
+        await this.$store.dispatch("UNBIND_ASSET", { Imei: this.info.boundAsset});
+      }
+
       let data = {
         MinorToken: this.info.MinorToken,
         MajorToken: this.info.MajorToken,
@@ -259,12 +263,12 @@ export default {
             }
 
              this.startTrip({
-          TaskCode: result.Data.Code,
-          UpdateTime: result.Data.UpdateTime,
-        });
+                TaskCode: result.Data.model.Code,
+                UpdateTime: result.Data.model.UpdateTime,
+              });
 
         } else {
-          console.log('good')
+        
              this.startTrip({
                 TaskCode: this.info.TaskCode,
                // UpdateTime: result.Data.UpdateTime,
@@ -282,6 +286,8 @@ export default {
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
       let customerInfo = this.$f7.methods.getFromStorage("customerInfo");
       let data = {};
+
+     
 
       if (Object.keys(customerInfo).length == 0) {
         data = {

@@ -8,7 +8,16 @@
 
           <f7-link
             v-if="newDelivery"
-            icon="f7-icons size-25 icon-arrow-back"
+            @click="newDelivery = false"
+            icon="f7-icons size-20 icon-arrow-back"
+          ></f7-link>
+
+          <f7-link
+            v-else-if="
+              currentTrip && currentTrip.isTripStarted && !editTripTemplate
+            "
+            icon="f7-icons size-20 icon-arrow-back"
+            @click="editTripTemplate = true"
           ></f7-link>
           <f7-link
             v-else
@@ -29,20 +38,128 @@
 
         <f7-nav-right>
           <f7-link
-            icon="f7-icons size-25 icon-header-alarm"
+            icon="f7-icons size-20 icon-header-alarm"
             href="/notifications/"
+          ></f7-link>
+
+          <f7-link
+            icon="f7-icons size-20 icon-header-close"
+            @click="cancelTrip()"
           ></f7-link>
         </f7-nav-right>
       </f7-navbar>
 
-      <template v-if="newDelivery">
+      <template v-if="editTripTemplate">
+        <f7-toolbar bottom no-shadow class="custom-toolbar">
+          <div class="row width-100 padding-horizontal">
+            <!-- <f7-button
+              color="custom"
+              fill
+              class="col-50 text-uppercase"
+              @click="editTrip"
+              >{{ $ml.get("HOME_MSG023") }}</f7-button
+            > -->
+            <f7-button
+              color="black"
+              fill
+              class="col-50 text-uppercase"
+              @click="
+                editTripTemplate = false;
+                newDelivery = false;
+              "
+              >{{ $ml.get("HOME_MSG024") }}</f7-button
+            >
+          </div>
+        </f7-toolbar>
+
+        <f7-list>
+          <f7-list-item
+            :title="$ml.get('HOME_MSG006')"
+            :after="currentTrip.Trip.AssetName"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons size-25 icon-other-asset text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+
+          <f7-list-item
+            :title="$ml.get('FAULTS_MSG005')"
+            after="Farmwize CheckSheet "
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-other-checklist text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+
+          <f7-list-item
+            :after="firstName + lastName"
+            :title="$ml.get('HOME_MSG003')"
+          >
+            <f7-icons
+              slot="media"
+              icon="f7-icons icon-profile-name text-color-lightgray"
+            ></f7-icons>
+          </f7-list-item>
+
+          <f7-list-item
+            :title="$ml.get('HOME_MSG009')"
+            @click="selectTripType"
+            :after="selectedTrip"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-menu-trips text-color-lightgray"
+            ></f7-icon>
+          </f7-list-item>
+          <f7-list-input
+            v-show="isBusinessTrip"
+            :label="$ml.get('HOME_MSG014')"
+            type="text"
+            :placeholder="$ml.get('HOME_MSG014')"
+            clear-button
+            :value="customerName"
+            @input="customerName = $event.target.value"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-profile-name text-color-lightgray"
+            ></f7-icon>
+          </f7-list-input>
+          <f7-list-input
+            v-show="isBusinessTrip"
+            :label="$ml.get('HOME_MSG015')"
+            type="text"
+            :placeholder="$ml.get('HOME_MSG015')"
+            :value="customerAddress"
+            readonly
+            clear-button
+            @input="customerAddress = $event.target.value"
+          >
+            <f7-icon
+              slot="media"
+              icon="f7-icons icon-address text-color-lightgray"
+            ></f7-icon>
+
+            <div
+              slot="content-end"
+              @click.stop="isMapDeliveryAddressOpened = true"
+              class="link margin-right"
+            >
+              <i class="f7-icons size-25 icon-address text-color-blue"></i>
+            </div>
+          </f7-list-input>
+        </f7-list>
+      </template>
+      <template v-else-if="newDelivery">
         <f7-toolbar bottom no-shadow class="custom-toolbar">
           <div class="row width-100 padding-horizontal">
             <f7-button
               color="custom"
               fill
               class="col text-uppercase"
-              @click="startTrip"
+              @click="endTrip(false)"
               >{{ $ml.get("HOME_MSG005") }}</f7-button
             >
           </div>
@@ -109,6 +226,7 @@
             type="text"
             :placeholder="$ml.get('HOME_MSG015')"
             :value="customerAddress"
+            readonly
             clear-button
             @input="customerAddress = $event.target.value"
           >
@@ -187,11 +305,11 @@
 
               <div class="width-100 flex-direction-column align-items-stretch">
                 <div class="size-12 item-title only-2-rows">
-                 <span>{{trip.DriverCustomerName}}</span>
+                  <span>{{ trip.DriverCustomerName }}</span>
                   <div class="item-header text-color-gray">
                     {{ trip.BeginLocalTime }}
                   </div>
-                  {{trip.StartAddress}}
+                  {{ trip.StartAddress }}
                 </div>
                 <div class="item-text margin-half">
                   <div class="row no-gap">
@@ -207,7 +325,8 @@
                           margin-left-half
                           text-color-gray
                         "
-                        > {{ trip.Runtime }}</span 
+                      >
+                        {{ trip.Runtime }}</span
                       >
                     </div>
                     <div class="col-50">
@@ -258,8 +377,10 @@
                   </div>
                 </div>
                 <div class="item-title size-12 only-2-rows">
-                  <div class="item-header text-color-gray">{{ trip.EndLocalTime }}</div>
-                  {{trip.EndAddress}}
+                  <div class="item-header text-color-gray">
+                    {{ trip.EndLocalTime }}
+                  </div>
+                  {{ trip.EndAddress }}
                 </div>
               </div>
             </f7-list-item>
@@ -270,7 +391,11 @@
         <f7-list>
           <f7-list-item
             :title="$ml.get('HOME_MSG006')"
-            :after="currentTrip.Trip.AssetName ? currentTrip.Trip.AssetName : assetName"
+            :after="
+              currentTrip.Trip.AssetName
+                ? currentTrip.Trip.AssetName
+                : assetName
+            "
           >
             <f7-icon
               slot="media"
@@ -279,7 +404,7 @@
           </f7-list-item>
           <f7-list-item
             :title="$ml.get('HOME_MSG009')"
-            :after="$ml.get('TextTripType')"
+            :after="currentTrip.Trip.TripType ? $ml.get('TextTripType') : ''"
           >
             <f7-icon
               slot="media"
@@ -334,8 +459,9 @@
         </div>
 
         <f7-block>
+          <!-- :href="`/accident-report/?imei=${selectedAsset}`" -->
           <f7-link
-            :href="`/accident-report/?imei=${selectedAsset}`"
+            @click="createReport"
             icon="f7-icons size-25 icon-notification size-18 margin-right-half"
             :text="$ml.get('HOME_MSG013')"
             color="orange"
@@ -382,16 +508,16 @@
             >
               <i class="f7-icons size-25 icon-address text-color-blue"></i>
             </div>
-           
-            <div slot="content-end"  @click="scanBarCode" class="link margin-right">
+
+            <!-- <div slot="content-end"  @click="scanBarCode" class="link margin-right">
               <i class="f7-icons size-25 icon-scan text-color-blue"></i>
-            </div>  
+            </div>   -->
             <select name="assetList" v-model="selectedAsset" required validate>
               <option
                 v-for="asset in assetList"
                 :key="asset.IMEI"
                 :value="asset.IMEI"
-                :disabled="!!asset.ContactCode"
+                :disabled="!!asset.ContactCode && boundAsset != asset.IMEI"
               >
                 {{ asset.Name }}
               </option>
@@ -554,7 +680,9 @@ export default {
       coordsDelivery: [],
       isFirstTrip: true,
       completedTrips: [],
-      assetName: ''
+      assetName: "",
+      boundAsset: "",
+      editTripTemplate: false,
 
       //tripTypeText: enumTripTypes
       //user: this.$f7route.context.user,
@@ -582,6 +710,8 @@ export default {
       this.componentKeyChecklist = Date.now() + 1;
     },
     info() {
+       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
       this.firstName = this.info.User.FirstName;
       this.lastName = this.info.User.SubName;
       this.assetList = this.info.Devices || [];
@@ -593,9 +723,45 @@ export default {
           this.selectedAsset = asset.IMEI;
         }
       }
+
+
+
+       if (this.info.TaskCode) {
+          if( this.info.boundAsset) {
+            let asset = this.assetList.find(
+            (itm) => itm.IMEI === this.info.boundAsset
+          );
+
+          let obj = {
+            isTripStarted: true,
+            Trip: additionalFlags.Trip
+              ? additionalFlags.Trip
+              : {
+                 AssetName: asset.Name,
+                 AssetId: asset.ID,
+                 IMEI: asset.IMEI,
+                  //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
+                  TaskCode: this.info.TaskCode,
+                  // TripType: additionalFlags.Trip.TripType,
+                },
+          };
+          this.$store.dispatch("updateCurrentTrip", obj);
+          } else {
+            this.endTrip(true, true)
+          }
+          
+        }
       // if(this.checkLists.length){
       //   this.selectedCheckList = this.checkLists[0].Code
       // }
+
+      if (this.info.boundAsset.length) {
+        this.boundAsset = this.info.boundAsset;
+        this.selectedAsset = this.boundAsset;
+      }
+        
+
+     
 
       this.showTrips();
     },
@@ -620,36 +786,14 @@ export default {
           MajorToken: this.info.MajorToken,
         };
         this.$f7.progressbar.show();
-        let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data)
-        
+        let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data);
+
         this.$f7.progressbar.hide();
 
 
-
-       
-
-        if(this.info.TaskCode.length && this.info.TripId === 0) {
-           let obj = {
-            isTripStarted: true,
-          };
-          this.$store.dispatch("updateCurrentTrip", obj);
-        }  else if (this.info.TaskCode.length && this.info.TripId === -1) {
-            this.newDelivery = true;
-
-            let obj = {
-                isTripStarted: false,
-                Trip: {
-                  TaskCode: this.info.TaskCode,
-                },
-              };
-
-              this.$f7.methods.setInStorage({
-                name: "additionalFlags",
-                data: obj,
-              });
-        }
         
-      
+     
+
         if (!result) {
           return;
         }
@@ -662,8 +806,8 @@ export default {
         this.componentKeyVehicle = Date.now();
         this.componentKeyChecklist = Date.now() + 1;
         let asset = this.assetList.find((itm) => itm.ID === val.Trip.AssetId);
-        this.isImmobilisationSupported =
-          (asset.Permissions & enumAssetPermissions.immobilisation) > 0;
+        //  this.isImmobilisationSupported =
+        //    (asset.Permissions & enumAssetPermissions.immobilisation) > 0;
         this.getCurrentTripDuration();
         this.currentTripDurationTimer = setInterval(
           this.getCurrentTripDuration,
@@ -753,11 +897,15 @@ export default {
               let obj = {
                 isTripStarted: false,
                 Trip: {
-                   AssetName: Object.keys(additionalFlags).length  ? additionalFlags.Trip.AssetName : '',
+                  AssetName: Object.keys(additionalFlags).length
+                    ? additionalFlags.Trip.AssetName
+                    : "",
                   // AssetId: this.assetId,
                   // IMEI: this.imei,
                   // StartTime: moment(params.UpdateTime).format(tFormat[0]),
-                  TaskCode: Object.keys(additionalFlags).length  ? additionalFlags.Trip.TaskCode : '',
+                  TaskCode: Object.keys(additionalFlags).length
+                    ? additionalFlags.Trip.TaskCode
+                    : this.info.TaskCode,
                   TripType: tripType,
                 },
               };
@@ -821,46 +969,98 @@ export default {
         },
       });
     },
-    async endTrip(isFinished) {
+
+    cancelTrip() {
+      this.$f7.methods.customDialog({
+        text: this.$ml.get("PROMPT_MSG043"),
+        buttons: [
+          {
+            text: this.$ml.get("QUESTIONS_MSG001"),
+            onClick: () => {
+              this.endTrip(true, true);
+            },
+          },
+          {
+            text: this.$ml.get("QUESTIONS_MSG003"),
+          },
+        ],
+      });
+    },
+
+   async editTrip() {
+
+           let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
+      if (!this.selectedTrip) {
+        this.$f7.methods.customDialog({
+          title: this.pageTitle,
+          text: this.$ml.get("PROMPT_MSG042"),
+        });
+        return;
+      }
+ 
+      let data = {
+          MinorToken: this.info.MinorToken,
+          MajorToken: this.info.MajorToken,
+          CustomerName:  this.customerName,
+          CustomerLat : this.coordsDelivery[0],
+          CustomerLng : this.coordsDelivery[1],
+          TaskCode: this.info.TaskCode
+            ? this.info.TaskCode
+            : additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
+        };
+
+        this.$f7.progressbar.show();
+        let result = await this.$store.dispatch("EDIT_TRIP", data);
+        this.$f7.progressbar.hide();
+
+        if (!result) {
+          return;
+        }
+    },
+
+    createReport() {
+      let notesArr = [];
+
+      for (var key in this.notes) {
+        notesArr.push(this.notes[key].note);
+      }
+      this.$f7router.navigate("/accident-report/?imei=" + this.selectedAsset, {
+        context: {
+          GenralNote: this.generalNote,
+          Notes: notesArr,
+        },
+      });
+    },
+    async endTrip(isFinished, toHome) {
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
       let notesArr = [];
 
-  
       for (var key in this.notes) {
         notesArr.push(this.notes[key].note);
       }
 
       if (isFinished) {
-
         let data = {
           GenralNote: this.generalNote,
           Notes: notesArr,
           MinorToken: this.info.MinorToken,
           MajorToken: this.info.MajorToken,
           isRouteFinished: isFinished,
-          TaskCode: additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
+          TaskCode: this.info.TaskCode
+            ? this.info.TaskCode
+            : additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
         };
-       
 
         this.$f7.progressbar.show();
         let result = await this.$store.dispatch("END_TRIP", data);
         this.$f7.progressbar.hide();
 
-        
-
         if (!result) {
           return;
         }
 
-        let tripObj = {
-          isTripStarted: false,
-         // Trip: {},
-        };
-        this.$f7.methods.setInStorage({
-          name: "additionalFlags",
-          data: tripObj,
-        });
-        this.$store.dispatch("updateCurrentTrip", tripObj);
+      
 
         this.$store.dispatch("SET_NOTIFICATION_STATUS", {
           IMEI: this.selectedAsset,
@@ -878,72 +1078,98 @@ export default {
           Type: !localStorage.DEVICE_TYPE ? "webapp" : localStorage.DEVICE_TYPE,
         });
 
-        this.$f7router.navigate("/trip/?id=3&getList=true", {
-          context: result.Data,
-      
-        });
+        if (!toHome) {
+          this.$f7router.navigate("/trip/?id="+additionalFlags.Trip.TaskCode+"&getList=true", {
+            context: result.Data,
+          });
+        }
 
-              this.$f7.methods.setInStorage({
-                name: 'panelDamage',
-                data: {}
-              });
-          
-       
-            this.$f7.methods.setInStorage({
-                name: 'trailerFloor',
-                data: {}
-              });
-         
-              this.$f7.methods.setInStorage({
-                name: 'trailerSidePanel',
-                data: {}
-              });
-           
-              this.$f7.methods.setInStorage({
-                name: 'tyres',
-                data: {}
-              });
-           
-              this.$f7.methods.setInStorage({
-                name: 'loadSheet',
-                data: {}
-              });
-
-        
-      } else {
-
-
-         
-      
         let tripObj = {
-          isTripStarted: true,
-          Trip: {
-          AssetName:  additionalFlags.Trip.AssetName,
-          AssetId: this.assetId,
-          IMEI: this.selectedAsset,
-          //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
-          TaskCode: additionalFlags.Trip.TaskCode,
-          TripType: additionalFlags.Trip.TripType,
-        },
+          isTripStarted: false,
+          Trip: {},
         };
+
         this.$f7.methods.setInStorage({
           name: "additionalFlags",
           data: tripObj,
         });
+        
         this.$store.dispatch("updateCurrentTrip", tripObj);
 
+        this.$f7.methods.setInStorage({
+          name: "panelDamage",
+          data: {},
+        });
 
-        let data = {
-          GenralNote: this.generalNote,
-          Notes: notesArr,
-          MinorToken: this.info.MinorToken,
-          MajorToken: this.info.MajorToken,
-          isRouteFinished: isFinished,
-          TaskCode: additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
-        };
-    
-        
-        let result = await this.$store.dispatch("END_TRIP", data);
+        this.$f7.methods.setInStorage({
+          name: "trailerFloor",
+          data: {},
+        });
+
+        this.$f7.methods.setInStorage({
+          name: "trailerSidePanel",
+          data: {},
+        });
+
+        this.$f7.methods.setInStorage({
+          name: "tyres",
+          data: {},
+        });
+
+        this.$f7.methods.setInStorage({
+          name: "loadSheet",
+          data: {},
+        });
+      } else {
+        if (!this.selectedTrip) {
+          this.$f7.methods.customDialog({
+            title: this.pageTitle,
+            text: this.$ml.get("PROMPT_MSG042"),
+          });
+          return;
+        }
+        let p = new Promise(async (resolve, reject) => {
+          try {
+            this.$f7.progressbar.show();
+            let result = await this.$store.dispatch("END_TRIP", {
+              GenralNote: this.generalNote,
+              Notes: notesArr,
+              MinorToken: this.info.MinorToken,
+              MajorToken: this.info.MajorToken,
+              isRouteFinished: isFinished,
+              TaskCode: additionalFlags.Trip.TaskCode,
+            });
+            this.$f7.progressbar.hide();
+
+            let tripObj = {
+              isTripStarted: true,
+              Trip: {
+                AssetName: additionalFlags.Trip.AssetName,
+                AssetId: this.assetId,
+                IMEI: this.selectedAsset,
+                //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
+                TaskCode: additionalFlags.Trip.TaskCode,
+                TripType: additionalFlags.Trip.TripType,
+              },
+            };
+            this.$f7.methods.setInStorage({
+              name: "additionalFlags",
+              data: tripObj,
+            });
+            this.$store.dispatch("updateCurrentTrip", tripObj);
+
+            if (result) {
+              resolve(result);
+              return;
+            }
+          } catch (e) {
+            this.$f7.progressbar.hide();
+          }
+        });
+
+        p.then((data) => {
+          this.startTrip();
+        });
       }
 
       /*if (window.BackgroundGeolocation) {
@@ -1035,22 +1261,14 @@ export default {
     },
 
     addNewDelivery() {
-      this.endTrip(false);
       this.newDelivery = true;
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
 
       this.assetName = additionalFlags.Trip.AssetName;
     },
     async startTrip() {
-      this.notes = {}
-      this.generalNote = ""
-      if (!this.selectedTrip) {
-        this.$f7.methods.customDialog({
-          title: this.pageTitle,
-          text: this.$ml.get("PROMPT_MSG042"),
-        });
-        return;
-      }
+      this.notes = {};
+      this.generalNote = "";
 
       if (this.customerAddress || this.customerName) {
         let obj = {
@@ -1103,7 +1321,7 @@ export default {
       let obj = {
         isTripStarted: true,
         Trip: {
-          AssetName:  additionalFlags.Trip.AssetName,
+          AssetName: additionalFlags.Trip.AssetName,
           AssetId: this.assetId,
           IMEI: this.selectedAsset,
           //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
@@ -1116,7 +1334,7 @@ export default {
         name: "additionalFlags",
         data: obj,
       });
- this.$store.dispatch("updateCurrentTrip", obj);
+      this.$store.dispatch("updateCurrentTrip", obj);
 
       this.$store.dispatch("SET_NOTIFICATION_STATUS", {
         IMEI: this.selectedAsset,
@@ -1136,100 +1354,122 @@ export default {
       this.showTrips();
     },
     async showTrips() {
-
-   
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
 
       let params = {
         MinorToken: this.info.MinorToken,
         MajorToken: this.info.MajorToken,
-        TaskCode: additionalFlags.Trip.TaskCode,
+        TaskCode: this.info.TaskCode
+          ? this.info.TaskCode
+          : additionalFlags.Trip.TaskCode,
       };
       let items;
-      if(params.TaskCode) {
-         items = await this.$store.dispatch("GET_TRIPS_FROM_API", params);
+      if (params.TaskCode) {
+        items = await this.$store.dispatch("GET_TRIPS_FROM_API", params);
       }
-      
+
       if (items && items.length) {
-
-
         for (let trip in items) {
-           
           if (items[trip].BeginTime) {
-           
-          items[trip].BeginLocalTime = moment(items[trip].BeginTime, "YYYY-MM-DD[T]HH:mm:ss")
+            items[trip].BeginLocalTime = moment(
+              items[trip].BeginTime,
+              "YYYY-MM-DD[T]HH:mm:ss"
+            )
               //.add(self.$app.data.UTCOFFSET, "minutes")
-              .format('YYYY-MM-DD HH:mm:ss');
+              .format("YYYY-MM-DD HH:mm:ss");
           }
           if (items[trip].EndTime) {
-           items[trip].EndLocalTime = moment(items[trip].EndTime, "YYYY-MM-DD[T]HH:mm:ss")
+            items[trip].EndLocalTime = moment(
+              items[trip].EndTime,
+              "YYYY-MM-DD[T]HH:mm:ss"
+            )
               //.add(self.$app.data.UTCOFFSET, "minutes")
-              .format('YYYY-MM-DD HH:mm:ss');
+              .format("YYYY-MM-DD HH:mm:ss");
           }
 
-        if (items[trip].StartLat && items[trip].StartLng) {
-          items[trip].StartAddress = await this.$store.dispatch(
-            "fetchAddress",
-            {
-              lat: items[trip].StartLat,
-              lng: items[trip].StartLng,
-            }
-          );
-        }
+          if (items[trip].StartLat && items[trip].StartLng) {
+            items[trip].StartAddress = await this.$store.dispatch(
+              "fetchAddress",
+              {
+                lat: items[trip].StartLat,
+                lng: items[trip].StartLng,
+              }
+            );
+          }
 
-        if (items[trip].EndLat && items[trip].EndLng) {
-          items[trip].EndAddress = await this.$store.dispatch(
-            "fetchAddress",
-            {
-              lat: items[trip].EndLat,
-              lng: items[trip].EndLng,
-            }
-          );
+          if (items[trip].EndLat && items[trip].EndLng) {
+            items[trip].EndAddress = await this.$store.dispatch(
+              "fetchAddress",
+              {
+                lat: items[trip].EndLat,
+                lng: items[trip].EndLng,
+              }
+            );
+          }
         }
-        }
-
-
- 
-        
       }
 
       this.completedTrips = items;
 
-
-
- 
-      if (this.completedTrips.length) {
+      if (this.completedTrips && this.completedTrips.length) {
         this.isFirstTrip = false;
       }
     },
     scanBarCode() {
       if (!navigator.camera) {
-          this.$f7.methods.customDialog({ title: this.$ml.get('PROMPT_MSG000'), text: this.$ml.get('PROMPT_MSG007') });
-          return;
-        }
-        let options = {
-          quality: 50,
-          destinationType: Camera.DestinationType.DATA_URL,
-          sourceType: 1, // 0:Photo Library, 1=Camera, 2=Saved Album
-          encodingType: 0 // 0=JPG 1=PNG
-        };
-
-
-    }
+        this.$f7.methods.customDialog({
+          title: this.$ml.get("PROMPT_MSG000"),
+          text: this.$ml.get("PROMPT_MSG007"),
+        });
+        return;
+      }
+      let options = {
+        quality: 50,
+        destinationType: Camera.DestinationType.DATA_URL,
+        sourceType: 1, // 0:Photo Library, 1=Camera, 2=Saved Album
+        encodingType: 0, // 0=JPG 1=PNG
+      };
+    },
   },
   created() {},
   mounted() {
     // setTimeout(this.endTrip, 3000, true)
-    this.assetList = this.info.Devices || [];
+      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
     this.checkLists = checkList;
     this.deliveryNotes = deliveryNotes;
 
-    if (this.assetList.length) {
-      let asset = this.assetList.find((itm) => !itm.ContactCode);
-      if (asset) {
-        this.selectedAsset = asset.IMEI;
+    this.$nextTick(() => {
+      this.assetList = this.info.Devices || [];
+      if (this.assetList.length) {
+        let asset = this.assetList.find((itm) => !itm.ContactCode);
+        if (asset) {
+          this.selectedAsset = asset.IMEI;
+        }
       }
-    }
+
+ 
+          if (this.info.TaskCode) {
+          let asset = this.assetList.find(
+            (itm) => itm.IMEI === this.info.boundAsset
+          );
+
+          let obj = {
+            isTripStarted: true,
+            Trip: additionalFlags.Trip
+              ? additionalFlags.Trip
+              : {
+                  AssetName: asset.Name,
+                  AssetId: asset.ID,
+                  IMEI: asset.IMEI,
+                  //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
+                  TaskCode: this.info.TaskCode,
+                  // TripType: additionalFlags.Trip.TripType,
+                },
+          };
+          this.$store.dispatch("updateCurrentTrip", obj);
+        }
+    });
 
     if (this.checkLists.length) {
       this.selectedCheckList = this.checkLists[0].Code;
@@ -1238,23 +1478,6 @@ export default {
     if (this.currentTrip && this.currentTrip.isTripStarted) {
       this.getCurrentTripDuration();
     }
-    
-    //app.smartSelect.get('.asset-select').setValue(someThing);
-
-
-        this.$nextTick(() => {
-
-
-
-        })
-
-
-      setTimeout(() => {
-                           console.log(this.$refs.assetSelect.f7SmartSelect )
-
-      }, 3000)
-
-    //this.selectedAsset = '0357424100649798'
   },
 };
 </script>

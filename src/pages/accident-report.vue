@@ -347,7 +347,7 @@
         isLoading: false,
         isMapSelectAddressOpened: false,
         imgAddress: APIMETHODS.DOMAIN9+'Attachment/images/',
-        //details: this.$f7route.context
+        details: this.$f7route.context,
 
         firstName: '',
         lastName: '',
@@ -382,6 +382,9 @@
     },
 
     mounted() {
+
+
+      console.log(this.details)
       this.getAssetDetails()
 
       this.firstName = this.info.User.FirstName;
@@ -452,6 +455,77 @@
       removeOtherDriver(index){
         this.otherVehicles.splice(index, 1)
       },
+      async endTrip() {
+        let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+
+          let data = {
+          GenralNote: this.details.GenralNote,
+          Notes: this.details.Notes,
+          MinorToken: this.info.MinorToken,
+          MajorToken: this.info.MajorToken,
+          isRouteFinished: true,
+          TaskCode: additionalFlags.Trip.TaskCode, //this.Trip.TaskCode,
+        };
+
+        this.$f7.progressbar.show();
+        let result = await this.$store.dispatch("END_TRIP", data);
+        this.$f7.progressbar.hide();
+
+        if (!result) {
+          return;
+        }
+
+        let tripObj = {
+          isTripStarted: false,
+         Trip: {},
+        };
+        this.$f7.methods.setInStorage({
+          name: "additionalFlags",
+          data: tripObj,
+        });
+        this.$store.dispatch("updateCurrentTrip", tripObj);
+
+        this.$store.dispatch("SET_NOTIFICATION_STATUS", {
+          IMEI: this.selectedAsset,
+          MinorToken: this.info.MinorToken,
+          State: 0,
+          MobileToken: !localStorage.PUSH_MOBILE_TOKEN
+            ? "123"
+            : localStorage.PUSH_MOBILE_TOKEN,
+          AppKey: !localStorage.PUSH_APP_KEY
+            ? "123"
+            : localStorage.PUSH_APP_KEY,
+          Token: !localStorage.PUSH_DEVICE_TOKEN
+            ? "123"
+            : localStorage.PUSH_DEVICE_TOKEN,
+          Type: !localStorage.DEVICE_TYPE ? "webapp" : localStorage.DEVICE_TYPE,
+        });
+        
+        this.$f7.methods.setInStorage({
+          name: "panelDamage",
+          data: {},
+        });
+
+        this.$f7.methods.setInStorage({
+          name: "trailerFloor",
+          data: {},
+        });
+
+        this.$f7.methods.setInStorage({
+          name: "trailerSidePanel",
+          data: {},
+        });
+
+        this.$f7.methods.setInStorage({
+          name: "tyres",
+          data: {},
+        });
+
+        this.$f7.methods.setInStorage({
+          name: "loadSheet",
+          data: {},
+        });
+      },
       async submitHandler() {
         let splittedCoords = this.addressCoords.split(',')
         let data = {
@@ -493,6 +567,8 @@
         this.$f7.methods.customDialog({
           text: this.$ml.get('PROMPT_MSG040')
         })
+
+        this.endTrip()
         this.$f7.view.main.router.back();
       }
     }

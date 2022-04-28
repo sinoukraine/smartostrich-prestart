@@ -84,5 +84,23 @@ export default {
         throw e
       }
     },
+    async UNBIND_ASSET({commit}, query){
+       
+      try {
+        const response = await Vue.axios.get(APIMETHODS.URL.UNBIND_ASSET, { params: query } );
+         console.log(response)
+        if (response.data.MajorCode === '000') {
+          return response
+        }else{
+          response.data.method = 'UNBIND_ASSET';
+          commit('setApiValidationError', response.data)
+          return false
+        }
+      } catch (e) {
+        if(e && e.response && e.response.data) e.response.data.method = 'UNBIND_ASSET';
+        commit('setError',  !e.response ? e : (!e.response.data) ? e.response : e.response.data)
+        throw e
+      }
+    },
   }
 }

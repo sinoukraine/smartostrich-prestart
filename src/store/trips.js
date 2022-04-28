@@ -49,6 +49,25 @@ export default {
         throw e
       }
     },
+    async EDIT_TRIP({commit, dispatch}, data){
+      try {
+        
+        let getParams = new URLSearchParams({ MinorToken: data.MinorToken, MajorToken: data.MajorToken });
+        const response = await Vue.axios.post(APIMETHODS.URL.EDIT_TRIP+'?'+getParams.toString(), data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}} );
+      
+
+        if(response.data.MajorCode === '000'){
+          return response.data
+        }else{
+          response.data.method = 'edit_trip';
+         // commit('setApiValidationError', response.data)
+          return false
+        }
+      } catch (e) {
+        commit('setError',  e)
+        throw e
+      }
+    },
     async END_TRIP({commit, dispatch}, data){
       try {
        
@@ -171,7 +190,7 @@ export default {
         const response = await Vue.axios.get(APIMETHODS.URL.GET_TASKS, { params: data } );
      
         if(response.data.MajorCode === '000' && response.data.Data && Array.isArray(response.data.Data)){
-         // commit('SET_TRIPS', response.data.Data)
+          // commit('SET_TRIPS', response.data.Data)
           return response.data.Data
           /*
         return response.data.Data;*/

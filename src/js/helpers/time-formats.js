@@ -4,5 +4,6 @@ export default [
   'DD/MM/YYYY HH:mm:ss',
   'YYYY-MM-DD',
   'YYYY-MM-DDTHH:mm:ssZ',
-  'MM/DD HH:mm'
+  'MM/DD HH:mm',
+  'DD/MM/YYYY%HH:mm:ss',
 ]

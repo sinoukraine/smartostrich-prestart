@@ -116,6 +116,7 @@ export default {
             return true;
           },
           customDialog(params) {
+          
             let buttons = !params.buttons ? [{ text: "OK" }] : params.buttons;
             let modalTex = "";
             if (params.title) {
@@ -143,6 +144,7 @@ export default {
               })
               .open();
           },
+
           customNotification(params) {
             this.notification
               .create({
@@ -183,14 +185,16 @@ export default {
               this.methods.getFromStorage("additionalFlags");
             let notifications = this.methods.getFromStorage("notifications");
 
-            localStorage.clear();
+            
 
             if (!this.methods.isObjEmpty(additionalFlags)) {
               this.methods.setInStorage({
                 name: "additionalFlags",
-                data: additionalFlags,
+                data: {},
               });
             }
+
+            localStorage.clear();
             if (!this.methods.isObjEmpty(notifications)) {
               this.methods.setInStorage({
                 name: "notifications",
@@ -504,6 +508,8 @@ export default {
       }*/
   },
   methods: {
+   
+
     async onReady(f7) {
       // Init cordova APIs (see cordova-app.js)
       if (Device.cordova) {
@@ -546,7 +552,7 @@ export default {
       );
       //this.$error(messages[fbError.code] || 'Something not good')
     },
-    apiValidationError(err) {
+     apiValidationError(err) {
       switch (err.method) {
         case "login":
           this.$f7.methods.customDialog({
@@ -590,7 +596,24 @@ export default {
           ) {
             this.$f7.methods.customDialog({
               title: this.$ml.get("PROMPT_MSG000"),
-              text: "You are already driving another vehicle: " + err.Data.UsingAssetName + ". Finish current trip and try again",
+              text:
+                "You are already driving another vehicle: " +
+                err.Data.UsingAssetName +
+                ". Finish current trip and try again",
+              buttons: [
+                {
+                  text: "OK",
+                },
+                {
+                  text: "Finish Trip",
+                   onClick: async () => {
+                   
+                      
+                   await this.$store.dispatch("UNBIND_ASSET", { Imei: err.Data.UsingAssetImei});
+                     //console.log(result);
+                  }
+                }
+              ],
             });
           } else {
             this.$f7.methods.customDialog({
@@ -620,10 +643,10 @@ export default {
               text: this.$ml.get("PROMPT_MSG015"),
             });
           } else {
-            this.$f7.methods.customDialog({
-              title: this.$ml.get("PROMPT_MSG000"),
-              text:   this.$ml.get("PROMPT_MSG001"),
-            });
+            // this.$f7.methods.customDialog({
+            //   title: this.$ml.get("PROMPT_MSG000"),
+            //   text: this.$ml.get("PROMPT_MSG001"),
+            // });
           }
           break;
 

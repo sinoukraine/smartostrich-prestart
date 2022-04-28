@@ -1,16 +1,14 @@
 <template>
   <f7-page :page-content="false">
-    
-
     <f7-navbar>
-  <f7-nav-left>
-  <f7-link
-            icon="f7-icons size-25 icon-header-arrow"
-            href="/trips/"
-          ></f7-link></f7-nav-left>
-  <f7-nav-title>{{pageTitle}}</f7-nav-title>
- 
-</f7-navbar>
+      <f7-nav-left>
+        <f7-link
+          icon="f7-icons size-25 icon-header-arrow"
+          href="/trips/"
+        ></f7-link
+      ></f7-nav-left>
+      <f7-nav-title>{{ pageTitle }}</f7-nav-title>
+    </f7-navbar>
     <f7-toolbar tabbar top>
       <f7-link tab-link="#tab-1" tab-link-active>{{
         $ml.get("TRIPS_MSG001")
@@ -326,6 +324,19 @@ export default {
   },
 
   methods: {
+    getDifferenceBTtwoDates(date1, date2) {
+      let ret = "";
+      if (date1 && date2) {
+        //let one_day=1000*60*60*24;
+
+        // Convert both dates to milliseconds
+        let date1_ms = moment(date1).valueOf();
+        let date2_ms = moment(date2).valueOf();
+
+        ret = date2_ms - date1_ms;
+      }
+      return ret;
+    },
     async getTrips(taskCode) {
       let tripsParams = {
         MinorToken: this.info.MinorToken,
@@ -338,7 +349,33 @@ export default {
         tripsParams
       );
 
-      this.tripList = tripsFromApi;
+     
+
+      let sortTrips = tripsFromApi.sort((a, b) => {
+        return moment(a.BeginTime).diff(b.BeginTime);
+      });
+
+      if (tripsFromApi) {
+        let msTime = this.getDifferenceBTtwoDates(
+          sortTrips[0].BeginTime,
+          sortTrips[sortTrips.length - 1].EndTime
+        );
+
+        this.trip.TripStat.Time = moment
+          .duration(msTime, "milliseconds")
+          .format("d[d] h[h] m[m]");
+      } else {
+         let msTime = this.getDifferenceBTtwoDates(
+          this.trip.TripStat.Start,
+          this.trip.TripStat.Finish,
+        );
+
+         this.trip.TripStat.Time = moment
+          .duration(msTime, "milliseconds")
+          .format("d[d] h[h] m[m]");
+      }
+
+      this.tripList = sortTrips;
 
       for (let trip in this.tripList) {
         if (this.tripList[trip].BeginTime) {
@@ -380,10 +417,7 @@ export default {
       }
     },
 
-
-    async getPlayBack() {
-
-    }
+    async getPlayBack() {},
   },
   async mounted() {
     let ret = {};
@@ -391,7 +425,9 @@ export default {
 
     if (this.$f7route.context && this.$f7route.context.IMEI) {
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
-      let taskCode = additionalFlags.Trip.TaskCode;
+
+
+    
 
       ret = {
         Name: this.$f7route.context.Name,
@@ -415,7 +451,7 @@ export default {
           SpeedUnit: "km/h",
           FuelUnit: "L",
           MileageUnit: "km",
-          TaskCode: this.$f7route.TaskCode,
+          TaskCode: this.$f7route.query.id,
         },
         Gauge: {},
       };
@@ -423,23 +459,29 @@ export default {
       ret.TripStat.Stars = this.$f7.methods.getStars(ret.TripStat.Raiting);
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
 
-      this.getTrips(taskCode);
+    
+        this.getTrips(ret.TripStat.TaskCode);
+    
     } else {
-       
+      let trip = this.trips.find(
+        (trip) => trip.TaskCode === this.$f7route.query.id
+      );
 
-      
+      // if(!trip) {
+      //       let tripsParams = {
+      //       MinorToken: this.info.MinorToken,
+      //       MajorToken: this.info.MajorToken,
+      //       TaskCode: this.$f7route.query.id,
+      //     };
 
-        let trip = this.trips.find(
-          (trip) => trip.EndTime === this.$f7route.query.id
-        );
+      //     let tripsFromApi = await this.$store.dispatch(
+      //       "GET_TRIPS_FROM_API",
+      //       tripsParams
+      //     );
 
+      // }
 
-        
-
-          console.log(this.trips, 'this.trips')
-          console.log(trip, 'trip')
-          console.log(this.$f7route.query.id, 'this.$f7route.query.id')
-       ret = {
+      ret = {
         Name: trip.AssetName,
         TripStat: {
           Raiting: "10",
@@ -473,22 +515,11 @@ export default {
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
 
       this.getTrips(trip.TaskCode);
-
-    
-
-
     }
 
- 
     this.pageTitle = ret.Name;
     this.trip = ret;
     this.loading = false;
-
-      this.$nextTick(() => {
-
-        console.log(ret, 'ret')
-      })
-     
 
     let playbackParams = {
       MinorToken: this.info.MinorToken,
