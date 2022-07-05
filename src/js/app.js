@@ -5,6 +5,8 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import './ml'
 
+import '@/utils/jquery-global.js';
+
 // Import Framework7
 import Framework7 from 'framework7/framework7.esm.bundle.js';
 

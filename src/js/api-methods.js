@@ -1,5 +1,5 @@
 const DOMAIN1 = "https://newapi.quiktrak.co/";
-
+const DOMAIN2 = "https://helper.quiktrak.com.au/"
 const DOMAIN4 = "https://osrm.sinopacific.com.ua/";
 const DOMAIN7 = "https://nominatim.sinopacific.com.ua/";
 const DOMAIN8 = "https://nominatim.openstreetmap.org/";
@@ -40,7 +40,10 @@ export default {
     REFRESH_PUSH_TOKEN: DOMAIN1 + "QuikTrak/V1/User/RefreshToken",
     GET_NEW_NOTIFICATIONS: DOMAIN1 + "QuikTrak/V1/Device/Alarms",
     GET_ASSET_DETAILS: DOMAIN1 + "Common/v1/Activation/GetAssetsInfo",
-    UNBIND_ASSET:  DOMAIN1  +   "/prestart/v1/user/UnbindAsset"
+    UNBIND_ASSET:  DOMAIN1  +   "/prestart/v1/user/UnbindAsset",
+    SET_LOCAL_DB: 'https://activation.smartostrich.quiktrak.eu/php/set_trip.php',
+    GET_ASSET_RATING: DOMAIN1 + "QuikTrak/V1/Device/DriverBehaviour",
+    SEND_TRIP_REPORT: DOMAIN2 + "send-smartostrich-trip/"
   }
 }
 //https://newapi.quiktrak.co/Common/v1/Activation/GetAssetsInfo

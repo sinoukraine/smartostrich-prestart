@@ -525,6 +525,10 @@
           name: "loadSheet",
           data: {},
         });
+         this.$f7.methods.setInStorage({
+          name: "OilWater",
+          data: {},
+        });
       },
       async submitHandler() {
         let splittedCoords = this.addressCoords.split(',')

@@ -314,6 +314,7 @@ export default {
       this.$f7.methods.getFromStorage("trailerSidePanel");
     let tyresStore = this.$f7.methods.getFromStorage("tyres");
     let loadSheetStore = this.$f7.methods.getFromStorage("loadSheet");
+    let OilWaterStore = this.$f7.methods.getFromStorage("OilWater");
    
     
     this.$nextTick(() => {
@@ -348,7 +349,12 @@ export default {
       } else {
         this.$refs.checkLists[4].checked = false;
       }
-
+      if (Object.keys(OilWaterStore).length !== 0) {
+        this.$refs.checkLists[5].checked = true;
+        this.answers.OilWater = OilWaterStore;
+      } else {
+        this.$refs.checkLists[5].checked = false;
+      }
 
      
       if (this.checkLists.length ===  Object.keys(this.answers).length) {

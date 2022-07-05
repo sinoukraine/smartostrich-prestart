@@ -20,6 +20,27 @@
         <f7-link icon="f7-icons icon-other-date" href="#"></f7-link>
       </f7-nav-right>-->
     </f7-navbar>
+    <f7-toolbar bottom no-shadow class="custom-toolbar">
+      <div class="row width-100 padding-horizontal">
+        <f7-button
+          color="custom"
+          fill
+             icon="margin-right display-inline-block size-18 icon-download text-color-white"
+          class="col-50 text-uppercase"
+          @click="downloadTripReport"
+          >{{ $ml.get("TRIPS_MSG027") }}</f7-button
+        >
+        <f7-button
+          color="orange"
+          fill
+           icon="margin-right display-inline-block size-18 icon-profile-email text-color-white"
+          class="col-50  text-uppercase"
+          @click="sendTripReport"
+          >{{ $ml.get("TRIPS_MSG028") }}
+          </f7-button
+        >
+      </div>
+    </f7-toolbar>
 
     <f7-list no-hairlines>
       <f7-list-item
@@ -120,11 +141,180 @@ export default {
     vlData: {
       items: [],
     },
+    formmatTrips: [],
   }),
   computed: {
     ...mapGetters(["info"]),
   },
   methods: {
+    async downloadTripReport() {
+    await this.genTripsArr();
+      var urlParams = "";
+      urlParams += "?MinorToken=" + this.info.MinorToken;
+      urlParams +=
+        "&Period=" +
+        moment()
+          .subtract(this.selectedPeriod, "days")
+          .startOf("day")
+          .utc()
+          .format(tFormat[7]) +
+        "-" +
+        moment().utc().format(tFormat[7]);
+
+        var ref = cordova.InAppBrowser.open("https://activation.smartostrich.quiktrak.eu/php/trip.php" + urlParams, '_system');
+
+
+       
+    
+     // location.href = "https://activation.smartostrich.quiktrak.eu/php/trip.php" + urlParams;
+
+    },
+    async sendTripReport() {
+      await this.genTripsArr();
+
+      var urlParams = "";
+      urlParams += "?MinorToken=" + this.info.MinorToken;
+      urlParams +=
+        "&Period=" +
+        moment()
+          .subtract(this.selectedPeriod, "days")
+          .startOf("day")
+          .utc()
+          .format(tFormat[7]) +
+        "-" +
+        moment().utc().format(tFormat[7]); // Period;
+     
+      $.ajax({
+        type: "POST",
+        url: "https://helper.quiktrak.com.au/send-smartostrich-trip/",
+        dataType: "json",
+        data: {
+          MinorToken: this.info.MinorToken,
+          url:
+            "https://activation.smartostrich.quiktrak.eu/php/pdf/smartostrich_trip_" +
+            moment()
+              .subtract(this.selectedPeriod, "days")
+              .startOf("day")
+              .utc()
+              .format(tFormat[7]) +
+            "-" +
+            moment().utc().format(tFormat[7]) +
+            "_" +
+            this.info.MinorToken +
+            ".pdf",
+          recipients: this.info.User.EMail,
+        },
+        async: true,
+        cache: false,
+        beforeSend: function () {},
+        success: function (data) {},
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          console.log(XMLHttpRequest);
+          console.log(textStatus);
+          console.log(errorThrown);
+        },
+      });
+
+      location.href =
+        "https://activation.smartostrich.quiktrak.eu/php/trip.php" + urlParams;
+    },
+   
+    async genTripsArr() {
+      let params = {
+        MinorToken: this.info.MinorToken,
+        MajorToken: this.info.MajorToken,
+
+        from: moment()
+          .subtract(this.selectedPeriod, "days")
+          .startOf("day")
+          .utc()
+          .format(tFormat[1]),
+        to: moment().utc().format(tFormat[1]),
+      };
+
+      let tripsFromApi = await this.$store.dispatch(
+        "GET_TRIPS_FROM_API",
+        params
+      );
+
+      let formatTrips = tripsFromApi.map(async (trip) => {
+        let obj = {
+          ...trip,
+          AvgSpeed: trip.AvgSpeed + " km/h",
+          MaxSpeed: trip.MaxSpeed + " km/h",
+          BeginTime: moment(trip.BeginTime, "YYYY-MM-DD[T]HH:mm:ss").format(
+            "YYYY-MM-DD HH:mm:ss"
+          ),
+          EndTime: moment(trip.EndTime, "YYYY-MM-DD[T]HH:mm:ss").format(
+            "YYYY-MM-DD HH:mm:ss"
+          ),
+          TripType: trip.TripType == 1 ? "Business" : "Personal",
+          Mileage: trip.Mileage + " km",
+          FuelUsed: trip.FuelUsed + " L",
+          Ratiting: "10",
+        };
+
+        let fTrip = Object.assign({}, obj);
+
+        let PromiseStartAddress = this.$store.dispatch("fetchAddress", {
+          lat: trip.StartLat,
+          lng: trip.StartLng,
+        });
+
+        let PromiseEndAddress = this.$store.dispatch("fetchAddress", {
+          lat: trip.EndLat,
+          lng: trip.EndLng,
+        });
+
+        await PromiseStartAddress.then((data) => {
+          fTrip.StartAddress = data.split("'").join("");
+        });
+        await PromiseEndAddress.then((data) => {
+          fTrip.EndAddress = data.split("'").join("");
+        });
+
+        delete fTrip.TaskCode;
+        delete fTrip.EndLat;
+        delete fTrip.EndLng;
+        delete fTrip.StartLat;
+        delete fTrip.StartLng;
+        delete fTrip.Notes;
+        delete fTrip.ID;
+        delete fTrip.GenralNote;
+        delete fTrip.DriverCustomerLng;
+        delete fTrip.DriverCustomerLat;
+
+        return fTrip;
+      });
+
+      await Promise.all(formatTrips).then((values) => {
+        this.setToLocalDB(values);
+      });
+    },
+    async setToLocalDB(storage_data) {
+
+      
+ 
+ 
+      $.ajax({
+        type: "POST",
+        url: "https://activation.smartostrich.quiktrak.eu/php/set_trip.php",
+        dataType: "json",
+        data: JSON.stringify({
+          MinorToken: this.info.MinorToken,
+          StorageData: storage_data,
+        }),
+        async: true,
+        cache: false,
+        beforeSend: function () {},
+        success: function (data) {},
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          console.log(XMLHttpRequest);
+          console.log(textStatus);
+          console.log(errorThrown);
+        },
+      });
+    },
     searchAll(query, items) {
       const found = [];
       for (let i = 0; i < items.length; i += 1) {
@@ -162,7 +352,7 @@ export default {
         };
 
         this.loadingTrips = true;
-        
+
         let arr = await this.$store.dispatch("GET_TASKS_FROM_API", params);
         await this.$store.dispatch("GET_TRIPS_FROM_API", params);
 
@@ -191,10 +381,9 @@ export default {
           to: moment().utc().format(tFormat[1]),
         };
         this.loadingTrips = true;
-      
+
         let arr = await this.$store.dispatch("GET_TASKS_FROM_API", params);
         await this.$store.dispatch("GET_TRIPS_FROM_API", params);
-   
 
         let tasks = arr.filter(function (item) {
           return item.EndDate !== null;
@@ -213,7 +402,6 @@ export default {
   async mounted() {
     this.selectedPeriod = 3;
     this.componentKeyPeriod = Date.now();
-    
   },
 };
 </script>

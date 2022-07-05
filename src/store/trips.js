@@ -205,6 +205,36 @@ export default {
         commit('setError',  e)
         throw e
       }
+    },
+    async SET_LOCAL_DB( data){
+      try {   
+        const response = await Vue.axios.post(APIMETHODS.URL.SET_LOCAL_DB, data, {headers: {'Content-Type': 'application/json'}} );
+        if(response.data.MajorCode === '000'){
+          return response.data
+        }else{
+          
+         // commit('setApiValidationError', response.data)
+          return false
+        }
+      } catch (e) {
+      //  commit('setError',  e)
+        throw e
+      }
+    },
+    async SEND_TRIP_REPORT(data) {
+      try {   
+        const response = await Vue.axios.post(APIMETHODS.URL.SEND_TRIP_REPORT, data, {headers:  {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}} );
+        if(response.data.MajorCode === '000'){
+          return response.data
+        }else{
+          
+         // commit('setApiValidationError', response.data)
+          return false
+        }
+      } catch (e) {
+      //  commit('setError',  e)
+        throw e
+      }
     }
   }
 }

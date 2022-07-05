@@ -517,7 +517,7 @@
                 v-for="asset in assetList"
                 :key="asset.IMEI"
                 :value="asset.IMEI"
-                :disabled="!!asset.ContactCode && boundAsset != asset.IMEI"
+                :disabled="!!asset.ContactCode && info.MinorToken != asset.ContactCode"
               >
                 {{ asset.Name }}
               </option>
@@ -710,7 +710,7 @@ export default {
       this.componentKeyChecklist = Date.now() + 1;
     },
     info() {
-       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
 
       this.firstName = this.info.User.FirstName;
       this.lastName = this.info.User.SubName;
@@ -766,38 +766,43 @@ export default {
       this.showTrips();
     },
     async isLoggedIn(val) {
-      if (val) {
-        let additionalFlags =
-          this.$f7.methods.getFromStorage("additionalFlags");
-        if (
-          !this.$f7.methods.isObjEmpty(additionalFlags) &&
-          additionalFlags.isTripStarted &&
-          !this.$f7.methods.isObjEmpty(additionalFlags.Trip)
-        ) {
-          let obj = {
-            isTripStarted: additionalFlags.isTripStarted,
-            Trip: additionalFlags.Trip,
-          };
-          this.$store.dispatch("updateCurrentTrip", obj);
-        }
 
-        let data = {
-          MinorToken: this.info.MinorToken,
-          MajorToken: this.info.MajorToken,
-        };
-        this.$f7.progressbar.show();
-        let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data);
+ 
 
-        this.$f7.progressbar.hide();
+              let obj = {};
 
+              this.$f7.methods.setInStorage({
+                name: "additionalFlags",
+                data: obj,
+              });
+      // if (val) {
+      //   let additionalFlags =
+      //     this.$f7.methods.getFromStorage("additionalFlags");
+      //   if (
+      //     !this.$f7.methods.isObjEmpty(additionalFlags) &&
+      //     additionalFlags.isTripStarted &&
+      //     !this.$f7.methods.isObjEmpty(additionalFlags.Trip)
+      //   ) {
+      //     let obj = {
+      //       isTripStarted: additionalFlags.isTripStarted,
+      //       Trip: additionalFlags.Trip,
+      //     };
+      //     this.$store.dispatch("updateCurrentTrip", obj);
+      //   }
 
-        
-     
+      //   let data = {
+      //     MinorToken: this.info.MinorToken,
+      //     MajorToken: this.info.MajorToken,
+      //   };
+      //   this.$f7.progressbar.show();
+      //   let result = await this.$store.dispatch("GET_TRIPS_IN_PROGRESS", data);
 
-        if (!result) {
-          return;
-        }
-      }
+      //   this.$f7.progressbar.hide();
+
+      //   if (!result) {
+      //     return;
+      //   }
+      // }
     },
     currentTrip(val) {
       console.log("currentTrip", val);
@@ -1120,6 +1125,10 @@ export default {
           name: "loadSheet",
           data: {},
         });
+        this.$f7.methods.setInStorage({
+          name: "OilWater",
+          data: {},
+        });
       } else {
         if (!this.selectedTrip) {
           this.$f7.methods.customDialog({
@@ -1261,14 +1270,16 @@ export default {
     },
 
     addNewDelivery() {
+
       this.newDelivery = true;
+       this.notes = {};
+      this.generalNote = "";
       let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
 
       this.assetName = additionalFlags.Trip.AssetName;
     },
     async startTrip() {
-      this.notes = {};
-      this.generalNote = "";
+     
 
       if (this.customerAddress || this.customerName) {
         let obj = {
@@ -1433,8 +1444,7 @@ export default {
   },
   created() {},
   mounted() {
-    // setTimeout(this.endTrip, 3000, true)
-      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
+    
 
     this.checkLists = checkList;
     this.deliveryNotes = deliveryNotes;
@@ -1442,33 +1452,11 @@ export default {
     this.$nextTick(() => {
       this.assetList = this.info.Devices || [];
       if (this.assetList.length) {
-        let asset = this.assetList.find((itm) => !itm.ContactCode);
+        let asset = this.assetList.find((itm) => itm.ContactCode == this.info.MinorToken || !itm.ContactCode);
         if (asset) {
           this.selectedAsset = asset.IMEI;
         }
       }
-
- 
-          if (this.info.TaskCode) {
-          let asset = this.assetList.find(
-            (itm) => itm.IMEI === this.info.boundAsset
-          );
-
-          let obj = {
-            isTripStarted: true,
-            Trip: additionalFlags.Trip
-              ? additionalFlags.Trip
-              : {
-                  AssetName: asset.Name,
-                  AssetId: asset.ID,
-                  IMEI: asset.IMEI,
-                  //  StartTime: moment(params.UpdateTime).format(tFormat[0]),
-                  TaskCode: this.info.TaskCode,
-                  // TripType: additionalFlags.Trip.TripType,
-                },
-          };
-          this.$store.dispatch("updateCurrentTrip", obj);
-        }
     });
 
     if (this.checkLists.length) {

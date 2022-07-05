@@ -278,6 +278,16 @@ export default {
                     ret = {};
                   }
                   break;
+                   case "OilWater":
+                  str = localStorage.getItem(
+                    "COM.QUIKTRAK.PRESTART.OILWATERLIST"
+                  );
+                  if (str) {
+                    ret = JSON.parse(str);
+                  } else {
+                    ret = {};
+                  }
+                  break;
                 case "customerInfo":
                   str = localStorage.getItem(
                     "COM.QUIKTRAK.PRESTART.CUSTOMERINFO"
@@ -348,6 +358,12 @@ export default {
                 case "loadSheet":
                   localStorage.setItem(
                     "COM.QUIKTRAK.PRESTART.LOADSHEETLIST",
+                    JSON.stringify(params.data)
+                  );
+                  break;
+                   case "OilWater":
+                  localStorage.setItem(
+                    "COM.QUIKTRAK.PRESTART.OILWATERLIST",
                     JSON.stringify(params.data)
                   );
                   break;

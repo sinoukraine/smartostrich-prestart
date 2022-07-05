@@ -344,13 +344,15 @@ export default {
         TaskCode: taskCode,
       };
 
+
+      
       let tripsFromApi = await this.$store.dispatch(
         "GET_TRIPS_FROM_API",
         tripsParams
       );
 
      
-
+     
       let sortTrips = tripsFromApi.sort((a, b) => {
         return moment(a.BeginTime).diff(b.BeginTime);
       });
@@ -417,17 +419,14 @@ export default {
       }
     },
 
-    async getPlayBack() {},
+    
   },
   async mounted() {
     let ret = {};
     let utcOffset = moment().utcOffset();
 
     if (this.$f7route.context && this.$f7route.context.IMEI) {
-      let additionalFlags = this.$f7.methods.getFromStorage("additionalFlags");
-
-
-    
+     
 
       ret = {
         Name: this.$f7route.context.Name,
@@ -451,7 +450,7 @@ export default {
           SpeedUnit: "km/h",
           FuelUnit: "L",
           MileageUnit: "km",
-          TaskCode: this.$f7route.query.id,
+          TaskCode:  this.$f7route.query.id,
         },
         Gauge: {},
       };
@@ -459,27 +458,14 @@ export default {
       ret.TripStat.Stars = this.$f7.methods.getStars(ret.TripStat.Raiting);
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
 
-    
+        console.log( ret.TripStat.Stars)
         this.getTrips(ret.TripStat.TaskCode);
     
     } else {
       let trip = this.trips.find(
         (trip) => trip.TaskCode === this.$f7route.query.id
       );
-
-      // if(!trip) {
-      //       let tripsParams = {
-      //       MinorToken: this.info.MinorToken,
-      //       MajorToken: this.info.MajorToken,
-      //       TaskCode: this.$f7route.query.id,
-      //     };
-
-      //     let tripsFromApi = await this.$store.dispatch(
-      //       "GET_TRIPS_FROM_API",
-      //       tripsParams
-      //     );
-
-      // }
+ 
 
       ret = {
         Name: trip.AssetName,
@@ -513,7 +499,7 @@ export default {
       //ret.TripStat.Raiting = trip.Raiting;
       ret.TripStat.Stars = this.$f7.methods.getStars(ret.TripStat.Raiting);
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
-
+      console.log( ret.TripStat.Stars)
       this.getTrips(trip.TaskCode);
     }
 

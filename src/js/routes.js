@@ -85,7 +85,10 @@ var routes = [
         name: 'accident-report',
         component: AccidentReport
     },
-
+    {
+        path: '/download-report/',
+        url: 'https://activation.smartostrich.quiktrak.eu/php/trip.php',
+    },
 
     {
         path: '(.*)',

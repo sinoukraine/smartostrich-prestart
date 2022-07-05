@@ -214,6 +214,7 @@ export default {
         ...this.answers.TrailerSidePanel,
         ...this.answers.Tyres,
         ...this.answers.LoadSheet,
+        ...this.answers.OilWater,
       };
 
       // counting answers states

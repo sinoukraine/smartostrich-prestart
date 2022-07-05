@@ -150,6 +150,12 @@ export default {
                 data: this.answers
               });
               break;
+               case '6': 
+              this.$f7.methods.setInStorage({
+                name: 'OilWater',
+                data: this.answers
+              });
+              break;
             default: 
             this.dialog.alert('There is no function associated with this code - '+this.checklist.Code);
          }

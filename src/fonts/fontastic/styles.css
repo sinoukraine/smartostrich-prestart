@@ -200,3 +200,6 @@
 .icon-live-trip:before {
   content: "\31";
 }
+.icon-download:before {
+  content: "\32";
+}
