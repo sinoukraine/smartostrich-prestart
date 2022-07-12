@@ -1,4 +1,28 @@
-export default [
+export default [{
+    "Options": [
+        {
+            "Reasons": [],
+            "Code": "61",
+            "CheckCode": "6",
+            "Name": "Oil",
+            "Memo": "",
+            "Order": 97
+        },
+        {
+            "Reasons": [],
+            "Code": "62",
+            "CheckCode": "6",
+            "Name": "Water",
+            "Memo": "",
+            "Order": 98
+        },
+    
+     
+    ],
+    "Code": "6",
+    "Name": "Oil and Water",
+    "CustomerCode": "d0e0c662-a9d0-4b3e-8f8c-954273f0db96"
+},
   {
     "Options": [
         {
@@ -146,31 +170,6 @@ export default [
     ],
     "Code": "5",
     "Name": "Load Sheet",
-    "CustomerCode": "d0e0c662-a9d0-4b3e-8f8c-954273f0db96"
-},
-{
-    "Options": [
-        {
-            "Reasons": [],
-            "Code": "61",
-            "CheckCode": "6",
-            "Name": "Oil",
-            "Memo": "",
-            "Order": 97
-        },
-        {
-            "Reasons": [],
-            "Code": "62",
-            "CheckCode": "6",
-            "Name": "Water",
-            "Memo": "",
-            "Order": 98
-        },
-    
-     
-    ],
-    "Code": "6",
-    "Name": "Oil and Water",
     "CustomerCode": "d0e0c662-a9d0-4b3e-8f8c-954273f0db96"
 },
 ]

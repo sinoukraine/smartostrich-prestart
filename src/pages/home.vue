@@ -42,10 +42,10 @@
             href="/notifications/"
           ></f7-link>
 
-          <f7-link
+          <!-- <f7-link
             icon="f7-icons size-20 icon-header-close"
             @click="cancelTrip()"
-          ></f7-link>
+          ></f7-link> -->
         </f7-nav-right>
       </f7-navbar>
 

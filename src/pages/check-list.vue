@@ -319,41 +319,41 @@ export default {
     
     this.$nextTick(() => {
       if (Object.keys(panelDamageStore).length !== 0) {
-        this.$refs.checkLists[0].checked = true;
-        this.answers.PanelDamaged = panelDamageStore;
-      } else {
-        this.$refs.checkLists[0].checked = false;
-      }
-      if (Object.keys(trailerFloorStore).length !== 0) {
         this.$refs.checkLists[1].checked = true;
-        this.answers.TrailerFloor = trailerFloorStore;
+        this.answers.PanelDamaged = panelDamageStore;
       } else {
         this.$refs.checkLists[1].checked = false;
       }
-
-      if (Object.keys(trailerSidePanelStore).length !== 0) {
+      if (Object.keys(trailerFloorStore).length !== 0) {
         this.$refs.checkLists[2].checked = true;
-        this.answers.TrailerSidePanel = trailerSidePanelStore;
+        this.answers.TrailerFloor = trailerFloorStore;
       } else {
         this.$refs.checkLists[2].checked = false;
       }
-      if (Object.keys(tyresStore).length !== 0) {
+
+      if (Object.keys(trailerSidePanelStore).length !== 0) {
         this.$refs.checkLists[3].checked = true;
-        this.answers.Tyres = tyresStore;
+        this.answers.TrailerSidePanel = trailerSidePanelStore;
       } else {
         this.$refs.checkLists[3].checked = false;
       }
-      if (Object.keys(loadSheetStore).length !== 0) {
+      if (Object.keys(tyresStore).length !== 0) {
         this.$refs.checkLists[4].checked = true;
-        this.answers.LoadSheet = loadSheetStore;
+        this.answers.Tyres = tyresStore;
       } else {
         this.$refs.checkLists[4].checked = false;
       }
-      if (Object.keys(OilWaterStore).length !== 0) {
+      if (Object.keys(loadSheetStore).length !== 0) {
         this.$refs.checkLists[5].checked = true;
-        this.answers.OilWater = OilWaterStore;
+        this.answers.LoadSheet = loadSheetStore;
       } else {
         this.$refs.checkLists[5].checked = false;
+      }
+      if (Object.keys(OilWaterStore).length !== 0) {
+        this.$refs.checkLists[0].checked = true;
+        this.answers.OilWater = OilWaterStore;
+      } else {
+        this.$refs.checkLists[0].checked = false;
       }
 
      
