@@ -15,8 +15,7 @@
       }}</f7-link>
       <f7-link tab-link="#tab-2">{{ $ml.get("TRIPS_MSG002") }}</f7-link>
       <f7-link tab-link="#tab-3">{{ $ml.get("TRIPS_MSG023") }}</f7-link>
-      <f7-link tab-link="#tab-4">{{ $ml.get("TRIPS_MSG024") }}</f7-link>
-    </f7-toolbar>
+     </f7-toolbar>
 
     <f7-tabs animated>
       <f7-tab id="tab-1" class="page-content" tab-active>
@@ -226,6 +225,15 @@
                 </div>
                 {{ trip.EndAddress }}
               </div>
+
+              <f7-button
+          
+                 color="custom"
+                 fill
+                  class="col-50 text-uppercase margin-top"
+                 @click="showPhotoAndNotes(trip.EndTime)"
+              >{{ $ml.get("TRIPS_MSG029") }}</f7-button
+            >
             </div>
           </f7-list-item>
         </f7-list>
@@ -243,50 +251,7 @@
           <f7-preloader color="gray"></f7-preloader>
         </f7-block>
       </f7-tab>
-      <f7-tab id="tab-4" class="page-content">
-        <div v-for="trip of tripList" :key="trip.EndTime">
-          <f7-block-header>{{ $ml.get("HOME_MSG016") }}</f7-block-header>
-
-          <f7-list>
-            <f7-list-item header="..." :title="trip.GenralNote">
-              <f7-icon
-                slot="media"
-                icon="f7-icons size-25 icon-other-notes text-color-lightgray"
-              ></f7-icon>
-            </f7-list-item>
-          </f7-list>
-
-          <div v-for="(note, index) of trip.Notes" :key="note.Code">
-            <f7-block-header v-if="index % 2 == 0">{{
-              $ml.get("TRIPS_MSG026")
-            }}</f7-block-header>
-
-            <f7-block-header v-else>{{
-              $ml.get("TRIPS_MSG025")
-            }}</f7-block-header>
-
-            <f7-list>
-              <f7-list-item>
-                <div class="top-img-wrapper">
-                  <div class="top-img-content">
-                    <img
-                      v-if="note.PhotoPath"
-                      :src="imgAddress + note.PhotoPath"
-                      alt=""
-                    />
-                  </div>
-                </div>
-              </f7-list-item>
-              <f7-list-item header="Notes" :title="note.PhotoNote">
-                <f7-icon
-                  slot="media"
-                  icon="f7-icons size-25 icon-other-notes text-color-lightgray"
-                ></f7-icon>
-              </f7-list-item>
-            </f7-list>
-          </div>
-        </div>
-      </f7-tab>
+       
     </f7-tabs>
   </f7-page>
 </template>
@@ -324,6 +289,17 @@ export default {
   },
 
   methods: {
+    showPhotoAndNotes(endTime) {
+
+ 
+      this.$f7router.navigate({
+        name: "notes",
+        query: {
+         id: this.trip.TripStat.TaskCode,
+         endTime: endTime
+        }
+      });
+    },
     getDifferenceBTtwoDates(date1, date2) {
       let ret = "";
       if (date1 && date2) {
@@ -458,13 +434,15 @@ export default {
       ret.TripStat.Stars = this.$f7.methods.getStars(ret.TripStat.Raiting);
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
 
-        console.log( ret.TripStat.Stars)
+     
         this.getTrips(ret.TripStat.TaskCode);
     
     } else {
-      let trip = this.trips.find(
-        (trip) => trip.TaskCode === this.$f7route.query.id
-      );
+    console.log(this.trips)
+    let trip = this.trips.find(
+      (trip) => trip.TaskCode === this.$f7route.query.id
+    );
+    console.log(trip)
  
 
       ret = {
@@ -499,7 +477,7 @@ export default {
       //ret.TripStat.Raiting = trip.Raiting;
       ret.TripStat.Stars = this.$f7.methods.getStars(ret.TripStat.Raiting);
       ret.Gauge = this.$f7.methods.getGaugeRaitingDetails(ret.TripStat.Raiting);
-      console.log( ret.TripStat.Stars)
+     
       this.getTrips(trip.TaskCode);
     }
 

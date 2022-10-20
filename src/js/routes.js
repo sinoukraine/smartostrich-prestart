@@ -11,7 +11,7 @@ import Messages from '../pages/messages'
 import Message from '../pages/message'
 import AccidentReport from '../pages/accident-report'
 import CheckList from '../pages/check-list'
-
+import Notes from '../pages/notes'
 
 
 
@@ -44,6 +44,11 @@ var routes = [
         path: '/trip/',
         name: 'trip',
         component: Trip
+    },
+    {
+        path: '/notes/',
+        name: 'notes',
+        component: Notes
     },
     {
         path: '/settings/',
